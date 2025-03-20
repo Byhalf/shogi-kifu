@@ -1,5 +1,8 @@
-<span (click)="getCoordinates()">
-  @if(tile.koma){
-    <img [src]="getSvg(tile.koma)" alt="shogi piece">
-  }
+<span (drop)="onDrop($event,tile)" (dragover)="allowDrop($event)" (dragend)="onDragEnd($event)" >
+    <ng-container *ngIf="tile.koma">
+    <img  (dragstart)="onDragStart($event, tile)"  [src]="getSvg(tile.koma)" alt="shogi piece" draggable="true"
+           >
+
+      </ng-container>
+
 </span>

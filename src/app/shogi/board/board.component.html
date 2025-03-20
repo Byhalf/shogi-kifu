@@ -1,3 +1,16 @@
-@for (tile of boardTiles; track $index) {
-<shogi-tile class="grid-item" [tile]="tile"></shogi-tile>
-}
+
+<div class="grid-container">
+  @for (row of boardTiles; track $index) {
+    @for(tile of row; track $index){
+      <shogi-tile class="grid-item"  [tile]="tile"
+                  (tileSelected)="handleTileSelect($event)"
+                  (tileDropped)="handleTileDrop($event)"
+                  (tileUnSelected)="handleTileUnselect($event)"></shogi-tile>
+    }
+  }
+</div>
+
+
+
+
+
