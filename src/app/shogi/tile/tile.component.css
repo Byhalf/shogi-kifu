@@ -15,4 +15,5 @@ img {
   object-fit: contain;
   display: block;
   margin: auto;
+  aspect-ratio: 1/1;
 }

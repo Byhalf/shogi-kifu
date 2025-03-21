@@ -1,6 +1,6 @@
 import { Component, Input, Output } from '@angular/core';
 import { Tile } from '../interfaces/tile';
-import {Koma, KOMA_SVG_MAP} from '../interfaces/koma';
+import {getSvg, Koma, KOMA_SVG_MAP} from '../interfaces/koma';
 import {NgIf} from '@angular/common';
 import { EventEmitter } from '@angular/core';
 @Component({
@@ -13,15 +13,13 @@ import { EventEmitter } from '@angular/core';
 })
 export class TileComponent {
 
-  @Input() tile: Tile = { x: 0, y: 0 };
+  @Input() tile: Tile = { x: -1, y: -1 };
   @Output() tileDropped  = new EventEmitter<Tile>();
   @Output() tileSelected  = new EventEmitter<Tile>();
   @Output() tileUnSelected  = new EventEmitter<Tile>();
 
 
-  getSvg(koma: Koma) {
-    return KOMA_SVG_MAP[koma.kind + '_'+koma.player];
-  }
+
 
   onDragStart(event: DragEvent, tile: Tile) {
     this.tileSelected.emit(tile);
@@ -40,4 +38,6 @@ export class TileComponent {
     $event.preventDefault();
     this.tileUnSelected.emit($event);
   }
+
+  protected readonly getSvg = getSvg;
 }

@@ -1,13 +1,16 @@
 
 <div class="grid-container">
+  <shogi-hand class="column-left" [komas]="goteKomas"></shogi-hand>
   @for (row of boardTiles; track $index) {
     @for(tile of row; track $index){
       <shogi-tile class="grid-item"  [tile]="tile"
                   (tileSelected)="handleTileSelect($event)"
                   (tileDropped)="handleTileDrop($event)"
-                  (tileUnSelected)="handleTileUnselect($event)"></shogi-tile>
+                  (tileUnSelected)="handleTileUnselect()"></shogi-tile>
     }
   }
+  <shogi-hand class="column-right"  [komas]="senteKomas"></shogi-hand>
+
 </div>
 
 

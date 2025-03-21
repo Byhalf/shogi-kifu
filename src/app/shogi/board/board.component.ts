@@ -2,16 +2,19 @@ import {Component} from '@angular/core';
 
 import {TileComponent} from '../tile/tile.component';
 import {Tile} from '../interfaces/tile';
-import {INITIAL_SHOGI_BOARD} from '../interfaces/koma';
+import {INITIAL_SHOGI_BOARD, Koma} from '../interfaces/koma';
+import {HandComponent} from '../hand/hand.component';
 
 @Component({
   selector: 'shogi-board',
-  imports: [TileComponent],
+  imports: [TileComponent, HandComponent],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css',
 })
 export class BoardComponent {
   boardTiles: Tile[][] = [];
+  senteKomas: Koma[] = [];
+  goteKomas: Koma[] = [];
 
   readonly width: number = 9;
   constructor() {
@@ -24,36 +27,42 @@ export class BoardComponent {
   }
 
   selectedTile: Tile|undefined
-  targetedTile: Tile|undefined;
 
   handleTileDrop(tile: Tile): void {
-    console.log('Tile dropped:', tile);
-    this.targetedTile = tile;
     if (this.selectedTile) {
-      this.updateBoard(this.selectedTile, this.targetedTile);
+      this.updateBoard(this.selectedTile, tile);
     }
   }
 
-  handleTileUnselect(tile: Tile) {
-    console.log('Tile unselected :', tile);
+  handleTileUnselect() {
     this.selectedTile = undefined;
   }
 
   handleTileSelect(tile: Tile) {
-    console.log('Tile selected:', tile);
     this.selectedTile = tile;
   }
 
   updateBoard(selectedTile : Tile,targetedTile: Tile) {
-    console.log('Update board');
-
+    if(selectedTile.y === targetedTile.y && selectedTile.x === targetedTile.x) {
+      return;
+    }if(selectedTile.koma?.player === targetedTile.koma?.player){
+      return;
+    }
     this.boardTiles[selectedTile.y][selectedTile.x] = {x: selectedTile.x, y: selectedTile.y, koma: undefined} ;
 
     selectedTile.x = targetedTile.x;
     selectedTile.y = targetedTile.y;
 
-    this.boardTiles[targetedTile.y][targetedTile.x] = selectedTile ;
+    if(targetedTile.koma?.player === 'gote'){
+      targetedTile.koma.player = 'sente';
+      this.senteKomas.push(targetedTile.koma);
+        this.senteKomas = [...this.senteKomas]
+    }else if(targetedTile.koma?.player === 'sente'){
+        targetedTile.koma.player = 'gote';
+        this.goteKomas.push(targetedTile.koma);
+        this.goteKomas = [...this.goteKomas]
+    }
 
-    //this.boardTiles = [...this.boardTiles]; // Triggers change detection
+    this.boardTiles[targetedTile.y][targetedTile.x] = selectedTile ;
   }
 }
