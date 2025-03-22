@@ -16,11 +16,11 @@ export function unPromotePiece (komaType: KomaType): KomaUnpromoted {
   if(komaType === 'G'){
     return 'G';
   }
-  return <KomaUnpromoted> komaType.toLowerCase();
+  return komaType.toLowerCase() as KomaUnpromoted;
 }
 
 export function promotePiece(komaType: KomaType): KomaPromoted {
-  return <KomaPromoted> komaType.toUpperCase();
+  return komaType.toUpperCase() as KomaPromoted;
 }
 
 
@@ -44,7 +44,7 @@ export const KOMA_SVG_MAP: Record<string, string> = {
   'K_gote': 'assets/koma/1OU.svg'
 };
 
-export const INITIAL_SHOGI_BOARD: Array<Array<Koma | undefined>> = [
+export const INITIAL_SHOGI_BOARD: (Koma | undefined)[][] = [
   [
     { kind: 'l', player: 'gote' }, { kind: 'n', player: 'gote' }, { kind: 's', player: 'gote' },
     { kind: 'G', player: 'gote' }, { kind: 'K', player: 'gote' }, { kind: 'G', player: 'gote' },

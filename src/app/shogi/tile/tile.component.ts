@@ -1,8 +1,8 @@
-import { Component, Input, Output } from '@angular/core';
-import { Tile } from '../interfaces/tile';
-import {getSvg, Koma, KOMA_SVG_MAP} from '../interfaces/koma';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Tile} from '../interfaces/tile';
+import {getSvg} from '../interfaces/koma';
 import {NgIf} from '@angular/common';
-import { EventEmitter } from '@angular/core';
+
 @Component({
   selector: 'shogi-tile',
   imports: [

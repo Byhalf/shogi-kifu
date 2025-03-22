@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 
 import {TileComponent} from '../tile/tile.component';
 import {Tile} from '../interfaces/tile';
-import {INITIAL_SHOGI_BOARD, Koma, KomaType, KomaUnpromoted, PlayerType, unPromotePiece} from '../interfaces/koma';
+import {INITIAL_SHOGI_BOARD, Koma, KomaUnpromoted, unPromotePiece} from '../interfaces/koma';
 import {HandComponent} from '../hand/hand.component';
 
 @Component({
@@ -13,15 +13,15 @@ import {HandComponent} from '../hand/hand.component';
 })
 export class BoardComponent {
   boardTiles: Tile[][] = [];
-  senteKomas: Map<KomaUnpromoted, number> = new Map([]);
-  goteKomas: Map<KomaUnpromoted, number> = new Map([]);
+  senteKomas = new Map<KomaUnpromoted, number>([]);
+  goteKomas = new Map<KomaUnpromoted, number>([]);
 
   readonly width: number = 9;
 
   constructor() {
-    for (let y: number = 0; y < this.width; y++) {
+    for (let y = 0; y < this.width; y++) {
       this.boardTiles[y] = []; // Initialize each row as an array
-      for (let x: number = 0; x < this.width; x++) {
+      for (let x = 0; x < this.width; x++) {
         this.boardTiles[y][x] = {x: x, y: y, koma: INITIAL_SHOGI_BOARD[y][x]};
       }
     }
