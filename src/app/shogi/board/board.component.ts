@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 
 import {TileComponent} from '../tile/tile.component';
 import {Tile} from '../interfaces/tile';
-import {INITIAL_SHOGI_BOARD, Koma} from '../interfaces/koma';
+import {INITIAL_SHOGI_BOARD, Koma, KomaType, KomaUnpromoted, PlayerType, unPromotePiece} from '../interfaces/koma';
 import {HandComponent} from '../hand/hand.component';
 
 @Component({
@@ -13,56 +13,97 @@ import {HandComponent} from '../hand/hand.component';
 })
 export class BoardComponent {
   boardTiles: Tile[][] = [];
-  senteKomas: Koma[] = [];
-  goteKomas: Koma[] = [];
+  senteKomas: Map<KomaUnpromoted, number> = new Map([]);
+  goteKomas: Map<KomaUnpromoted, number> = new Map([]);
 
   readonly width: number = 9;
+
   constructor() {
     for (let y: number = 0; y < this.width; y++) {
       this.boardTiles[y] = []; // Initialize each row as an array
       for (let x: number = 0; x < this.width; x++) {
-        this.boardTiles[y][x]  = { x: x, y: y, koma: INITIAL_SHOGI_BOARD[y][x] };
+        this.boardTiles[y][x] = {x: x, y: y, koma: INITIAL_SHOGI_BOARD[y][x]};
       }
     }
   }
 
-  selectedTile: Tile|undefined
+  selectedKomaFromHand: Koma | undefined;
+
+  selectedTile: Tile | undefined
 
   handleTileDrop(tile: Tile): void {
     if (this.selectedTile) {
-      this.updateBoard(this.selectedTile, tile);
+      this.updateBoardFromBoard(tile);
+    }
+    if( this.selectedKomaFromHand){
+      this.updateBoardFromHand(tile);
     }
   }
 
   handleTileUnselect() {
     this.selectedTile = undefined;
+    this.selectedKomaFromHand = undefined;
   }
 
-  handleTileSelect(tile: Tile) {
+  handleKomaSelectFromHand(koma: Koma): void {
+    this.selectedKomaFromHand = koma;
+  }
+
+  handleTileSelectFromBoard(tile: Tile) {
     this.selectedTile = tile;
   }
 
-  updateBoard(selectedTile : Tile,targetedTile: Tile) {
-    if(selectedTile.y === targetedTile.y && selectedTile.x === targetedTile.x) {
-      return;
-    }if(selectedTile.koma?.player === targetedTile.koma?.player){
+  updateBoardFromHand(tile: Tile) {
+    if(!this.selectedKomaFromHand || tile.koma){
       return;
     }
-    this.boardTiles[selectedTile.y][selectedTile.x] = {x: selectedTile.x, y: selectedTile.y, koma: undefined} ;
-
-    selectedTile.x = targetedTile.x;
-    selectedTile.y = targetedTile.y;
-
-    if(targetedTile.koma?.player === 'gote'){
-      targetedTile.koma.player = 'sente';
-      this.senteKomas.push(targetedTile.koma);
-        this.senteKomas = [...this.senteKomas]
-    }else if(targetedTile.koma?.player === 'sente'){
-        targetedTile.koma.player = 'gote';
-        this.goteKomas.push(targetedTile.koma);
-        this.goteKomas = [...this.goteKomas]
+    if(this.selectedKomaFromHand?.player=='gote'){
+      this.decreaseQuantityKoma(this.goteKomas,this.selectedKomaFromHand?.kind as KomaUnpromoted)
+    }else{
+      this.decreaseQuantityKoma(this.senteKomas,this.selectedKomaFromHand?.kind as KomaUnpromoted)
     }
+    tile.koma = {kind :this.selectedKomaFromHand.kind , player:this.selectedKomaFromHand.player};
+  }
 
-    this.boardTiles[targetedTile.y][targetedTile.x] = selectedTile ;
+  updateBoardFromBoard( targetedTile: Tile) {
+    if(!this.selectedTile) {return}
+    if (this.selectedTile.y === targetedTile.y && this.selectedTile.x === targetedTile.x) {
+      return;
+    }
+    if (this.selectedTile.koma?.player === targetedTile.koma?.player) {
+      return;
+    }
+    this.boardTiles[this.selectedTile.y][this.selectedTile.x] = {x: this.selectedTile.x, y: this.selectedTile.y, koma: undefined};
+
+    this.selectedTile.x = targetedTile.x;
+    this.selectedTile.y = targetedTile.y;
+
+    if (targetedTile.koma) {
+      const komaType = unPromotePiece(targetedTile.koma.kind);
+      if(targetedTile.koma.player === 'gote'){
+        this.increaseQuantityKoma(this.senteKomas,komaType);
+      } else if (targetedTile.koma.player === 'sente') {
+        this.increaseQuantityKoma(this.goteKomas,komaType);
+      }
+    }
+    this.boardTiles[targetedTile.y][targetedTile.x] = this.selectedTile;
+  }
+
+  private increaseQuantityKoma( komas :Map<KomaUnpromoted, number> ,  komaType: KomaUnpromoted){
+    const quantityInHand = (komas.get(komaType) || 0) + 1;
+    komas.set(komaType, quantityInHand);
+  }
+
+  private decreaseQuantityKoma( komas :Map<KomaUnpromoted, number> ,  komaType: KomaUnpromoted){
+    let quantityInHand = komas.get(komaType);
+    if(quantityInHand){
+      quantityInHand -= 1;
+      if(quantityInHand ===0){
+        komas.delete(komaType);
+        return;
+      }
+      komas.set(komaType, quantityInHand);
+    }
   }
 }
+

@@ -29,6 +29,9 @@
 
 .column-right, .column-left{
   background-color: cadetblue;
+  display: flex;
+  flex-direction: column;
+
 }
 
 .column-right{
@@ -36,5 +39,7 @@
   grid-column: 11; /* Places it in the 11th column */
   grid-row: 1 / span 9; /* Spans all 9 rows */
   max-height: 500px;
+  flex-direction: column-reverse;
+
 }
 

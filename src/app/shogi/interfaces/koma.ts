@@ -2,20 +2,34 @@
 
 export interface Koma{
   kind: KomaType;
-  player : 'gote' | 'sente';
+  player : PlayerType;
 }
 
+export type PlayerType = 'gote' | 'sente';
 
-export type KomaType =
-  | 'P' | 'L' | 'N' | 'S' | 'G' | 'B' | 'R' | 'K'  //promoted pieces
-  | 'p' | 'l' | 'n' | 's' | 'b' | 'r'; // Regular pieces
+export type KomaType = KomaUnpromoted | KomaPromoted  ;
+
+export type KomaUnpromoted =  'p' | 'l' | 'n' | 's' | 'b' | 'r' | 'G';
+export type KomaPromoted =  'P' | 'L' | 'N' | 'S' | 'B' | 'R' | 'K';
+
+export function unPromotePiece (komaType: KomaType): KomaUnpromoted {
+  if(komaType === 'G'){
+    return 'G';
+  }
+  return <KomaUnpromoted> komaType.toLowerCase();
+}
+
+export function promotePiece(komaType: KomaType): KomaPromoted {
+  return <KomaPromoted> komaType.toUpperCase();
+}
+
 
 export const KOMA_SVG_MAP: Record<string, string> = {
   'p_sente': 'assets/koma/0FU.svg',
   'l_sente': 'assets/koma/0KY.svg',
   'n_sente': 'assets/koma/0KE.svg',
   's_sente': 'assets/koma/0GI.svg',
-  'G_sente': 'assets/koma/0GI.svg',
+  'G_sente': 'assets/koma/0KI.svg',
   'b_sente': 'assets/koma/0KA.svg',
   'r_sente': 'assets/koma/0HI.svg',
   'K_sente': 'assets/koma/0GY.svg',
@@ -24,7 +38,7 @@ export const KOMA_SVG_MAP: Record<string, string> = {
   'l_gote': 'assets/koma/1KY.svg',
   'n_gote': 'assets/koma/1KE.svg',
   's_gote': 'assets/koma/1GI.svg',
-  'G_gote': 'assets/koma/1GI.svg',
+  'G_gote': 'assets/koma/1KI.svg',
   'b_gote': 'assets/koma/1KA.svg',
   'r_gote': 'assets/koma/1HI.svg',
   'K_gote': 'assets/koma/1OU.svg'
@@ -68,6 +82,15 @@ export const INITIAL_SHOGI_BOARD: Array<Array<Koma | undefined>> = [
 ];
 
 
-export function getSvg(koma: Koma) {
-  return KOMA_SVG_MAP[koma.kind + '_'+koma.player];
+export function getSvg(koma: Koma): string; // Signature 1 (with Koma)
+export function getSvg(type: KomaUnpromoted, player: PlayerType): string; // Signature 2 (with type and player)
+export function getSvg(arg1: Koma | KomaUnpromoted, arg2?: PlayerType): string {
+  if (arg2 !== undefined) {
+    // If `arg2` exists, we're using the `KomaType` and `PlayerType` overload
+    return KOMA_SVG_MAP[arg1 + '_' + arg2];
+  } else {
+    // If `arg2` is not provided, we're using the `Koma` object overload
+    const koma = arg1 as Koma;
+    return KOMA_SVG_MAP[koma.kind + '_' + koma.player];
+  }
 }

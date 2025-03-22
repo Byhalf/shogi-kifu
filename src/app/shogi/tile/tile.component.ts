@@ -16,7 +16,7 @@ export class TileComponent {
   @Input() tile: Tile = { x: -1, y: -1 };
   @Output() tileDropped  = new EventEmitter<Tile>();
   @Output() tileSelected  = new EventEmitter<Tile>();
-  @Output() tileUnSelected  = new EventEmitter<Tile>();
+  @Output() tileUnSelected  = new EventEmitter();
 
 
 
@@ -36,7 +36,7 @@ export class TileComponent {
 
   onDragEnd($event: DragEvent) {
     $event.preventDefault();
-    this.tileUnSelected.emit($event);
+    this.tileUnSelected.emit();
   }
 
   protected readonly getSvg = getSvg;
