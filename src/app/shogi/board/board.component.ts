@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 
 import {TileComponent} from '../tile/tile.component';
 import {Tile} from '../interfaces/tile';
-import {INITIAL_SHOGI_BOARD, Koma, KomaUnpromoted, unPromotePiece} from '../interfaces/koma';
+import {INITIAL_SHOGI_BOARD, Koma, KomaUnpromoted, promotePiece, unPromotePiece} from '../interfaces/koma';
 import {HandComponent} from '../hand/hand.component';
 
 @Component({
@@ -51,6 +51,12 @@ export class BoardComponent {
 
   handleTileSelectFromBoard(tile: Tile) {
     this.selectedTile = tile;
+  }
+
+  handleTileDblClick(tile: Tile) {
+    if(tile.koma){
+      tile.koma.kind = promotePiece(tile.koma.kind)
+    }
   }
 
   updateBoardFromHand(tile: Tile) {

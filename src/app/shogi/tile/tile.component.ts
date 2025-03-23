@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {Tile} from '../interfaces/tile';
 import {getSvg} from '../interfaces/koma';
 import {NgIf} from '@angular/common';
@@ -10,6 +10,7 @@ import {NgIf} from '@angular/common';
   ],
   templateUrl: './tile.component.html',
   styleUrl: './tile.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TileComponent {
 
@@ -17,7 +18,7 @@ export class TileComponent {
   @Output() tileDropped  = new EventEmitter<Tile>();
   @Output() tileSelected  = new EventEmitter<Tile>();
   @Output() tileUnSelected  = new EventEmitter();
-
+  @Output() tileDoubleClicked = new EventEmitter<Tile>();
 
 
 
@@ -40,4 +41,8 @@ export class TileComponent {
   }
 
   protected readonly getSvg = getSvg;
+
+  onDoubleClick(tile: Tile) {
+    this.tileDoubleClicked.emit(tile);
+  }
 }

@@ -9,7 +9,8 @@
       <shogi-tile class="grid-item" [tile]="tile"
                   (tileSelected)="handleTileSelectFromBoard($event)"
                   (tileDropped)="handleTileDrop($event)"
-                  (tileUnSelected)="handleTileUnselect()">
+                  (tileUnSelected)="handleTileUnselect()"
+                  (tileDoubleClicked)="handleTileDblClick($event)">
       </shogi-tile>
     }
   }

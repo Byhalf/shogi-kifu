@@ -34,6 +34,13 @@ export const KOMA_SVG_MAP: Record<string, string> = {
   'r_sente': 'assets/koma/0HI.svg',
   'K_sente': 'assets/koma/0GY.svg',
 
+  'B_sente': 'assets/koma/0UM.svg',
+  'R_sente': 'assets/koma/0RY.svg',
+  'P_sente': 'assets/koma/0NG.svg',
+  'L_sente': 'assets/koma/0TO.svg',
+  'N_sente': 'assets/koma/0NY.svg',
+  'S_sente': 'assets/koma/0NK.svg',
+
   'p_gote': 'assets/koma/1FU.svg',
   'l_gote': 'assets/koma/1KY.svg',
   'n_gote': 'assets/koma/1KE.svg',
@@ -41,7 +48,15 @@ export const KOMA_SVG_MAP: Record<string, string> = {
   'G_gote': 'assets/koma/1KI.svg',
   'b_gote': 'assets/koma/1KA.svg',
   'r_gote': 'assets/koma/1HI.svg',
-  'K_gote': 'assets/koma/1OU.svg'
+  'K_gote': 'assets/koma/1OU.svg',
+
+  'B_gote': 'assets/koma/1UM.svg',
+  'R_gote': 'assets/koma/1RY.svg',
+  'P_gote': 'assets/koma/1NG.svg',
+  'L_gote': 'assets/koma/1TO.svg',
+  'N_gote': 'assets/koma/1NY.svg',
+  'S_gote': 'assets/koma/1NK.svg',
+
 };
 
 export const INITIAL_SHOGI_BOARD: (Koma | undefined)[][] = [
