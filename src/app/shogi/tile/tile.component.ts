@@ -2,6 +2,8 @@ import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@
 import {Tile} from '../interfaces/tile';
 import {getSvg} from '../interfaces/koma';
 import {NgIf} from '@angular/common';
+import {Subject, switchMap, takeUntil, tap, timer} from 'rxjs';
+import {subscribe} from 'node:diagnostics_channel';
 
 @Component({
   selector: 'shogi-tile',
@@ -21,6 +23,26 @@ export class TileComponent {
   @Output() tileDoubleClicked = new EventEmitter<Tile>();
 
 
+  private drop$ = new Subject<Tile>();
+  private doubleClick$ = new Subject<Tile>();
+
+  constructor() {
+    this.drop$
+      .pipe(
+        switchMap((tile) =>
+          timer(700).pipe(
+            takeUntil(this.doubleClick$.pipe(
+              tap(() => this.tileDoubleClicked.emit(tile)) // Emit only if double-click happens
+            ))
+          )
+        )
+      )
+      .subscribe({
+        complete: () => {
+        }
+      });
+  }
+
 
   onDragStart(event: DragEvent, tile: Tile) {
     this.tileSelected.emit(tile);
@@ -28,6 +50,7 @@ export class TileComponent {
 
   onDrop(event: DragEvent, tile: Tile) {
     event.preventDefault();
+    this.drop$.next(tile);
     this.tileDropped.emit(tile);
   }
 // required for onDrop firing
@@ -43,6 +66,6 @@ export class TileComponent {
   protected readonly getSvg = getSvg;
 
   onDoubleClick(tile: Tile) {
-    this.tileDoubleClicked.emit(tile);
+    this.doubleClick$.next(tile);
   }
 }

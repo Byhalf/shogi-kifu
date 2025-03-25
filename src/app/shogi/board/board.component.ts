@@ -27,9 +27,11 @@ export class BoardComponent {
     }
   }
 
+// I dislike this is not more stateless
+  // I don't like that it's different Types koma/tile
   selectedKomaFromHand: Koma | undefined;
-
-  selectedTile: Tile | undefined
+  selectedTile: Tile | undefined;
+  targetedTile: Tile | undefined; // I don't like it is modified differentlyn than the other too
 
   handleTileDrop(tile: Tile): void {
     if (this.selectedTile) {
@@ -54,9 +56,9 @@ export class BoardComponent {
   }
 
   handleTileDblClick(tile: Tile) {
-    if(tile.koma){
+    if(tile.koma && this.targetedTile){
       tile.koma.kind = promotePiece(tile.koma.kind)
-    }
+    }this.targetedTile = undefined;
   }
 
   updateBoardFromHand(tile: Tile) {
@@ -72,6 +74,7 @@ export class BoardComponent {
   }
 
   updateBoardFromBoard( targetedTile: Tile) {
+    // no self move or self eating
     if(!this.selectedTile) {return}
     if (this.selectedTile.y === targetedTile.y && this.selectedTile.x === targetedTile.x) {
       return;
@@ -79,11 +82,8 @@ export class BoardComponent {
     if (this.selectedTile.koma?.player === targetedTile.koma?.player) {
       return;
     }
-    this.boardTiles[this.selectedTile.y][this.selectedTile.x] = {x: this.selectedTile.x, y: this.selectedTile.y, koma: undefined};
 
-    this.selectedTile.x = targetedTile.x;
-    this.selectedTile.y = targetedTile.y;
-
+    // eat the koma
     if (targetedTile.koma) {
       const komaType = unPromotePiece(targetedTile.koma.kind);
       if(targetedTile.koma.player === 'gote'){
@@ -92,7 +92,12 @@ export class BoardComponent {
         this.increaseQuantityKoma(this.goteKomas,komaType);
       }
     }
-    this.boardTiles[targetedTile.y][targetedTile.x] = this.selectedTile;
+
+    // update the board
+    targetedTile.koma = this.selectedTile.koma;
+    this.selectedTile.koma = undefined;
+    this.targetedTile = targetedTile;
+
   }
 
   private increaseQuantityKoma( komas :Map<KomaUnpromoted, number> ,  komaType: KomaUnpromoted){
