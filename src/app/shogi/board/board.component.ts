@@ -2,11 +2,11 @@ import {Component} from '@angular/core';
 
 import {TileComponent} from '../tile/tile.component';
 import {Tile} from '../interfaces/tile';
-import {INITIAL_SHOGI_BOARD, Koma, KomaUnpromoted, promotePiece, unPromotePiece} from '../interfaces/koma';
+import {INITIAL_SHOGI_BOARD, isKomaUnpromoted, Koma, KomaType, promotePiece, unPromotePiece} from '../interfaces/koma';
 import {HandComponent} from '../hand/hand.component';
-import { Move, movementType} from '../interfaces/move';
-import {fromEvent, map, merge, of, Subject, switchMap, take, takeUntil, timer} from 'rxjs';
-import {subscribe} from 'node:diagnostics_channel';
+import {Move, movementType} from '../interfaces/move';
+import {map, merge, Subject, take, takeUntil, timer} from 'rxjs';
+import {MovementService} from '../services/movement.service';
 
 @Component({
   selector: 'shogi-board',
@@ -16,26 +16,28 @@ import {subscribe} from 'node:diagnostics_channel';
 })
 export class BoardComponent {
   boardTiles: Tile[][] = [];
-  senteKomas = new Map<KomaUnpromoted, number>([]);
-  goteKomas = new Map<KomaUnpromoted, number>([]);
+  senteKomas = new Map<KomaType, number>([]);
+  goteKomas = new Map<KomaType, number>([]);
+  private movementService: MovementService;
+  private readonly size: number = 9;
 
-  readonly width: number = 9;
-
-  constructor() {
-    for (let y = 0; y < this.width; y++) {
+  constructor(movementService: MovementService) {
+    for (let y = 0; y < this.size; y++) {
       this.boardTiles[y] = []; // Initialize each row as an array
-      for (let x = 0; x < this.width; x++) {
+      for (let x = 0; x < this.size; x++) {
         this.boardTiles[y][x] = {x: x, y: y, koma: INITIAL_SHOGI_BOARD[y][x]};
       }
     }
+    this.movementService = movementService;
   }
 
 // I dislike this is not more stateless
   // I don't like that it's different Types koma/tile
   private selectedKomaFromHand: Koma | undefined;
-  private selectedTile: Tile | undefined;
+  private selectedTile: Tile | undefined; //can I merge these two
   private selectedNewTile$ = new Subject<void>();
-  private doubleClickDuringTimeout$ = new Subject<void>();
+  // can I use an observable instead ?
+  private doubleClickEvent$ = new Subject<void>();
   private destroy$ = new Subject<void>();
 
   ngOnDestroy() {
@@ -44,36 +46,47 @@ export class BoardComponent {
   }
 
   handleTileDrop(eventData: { event: Event, tile: Tile }): void {
-    const { event, tile } = eventData;
-    let moveDescription:Move | undefined;
+    const {event, tile} = eventData;
+    let moveDescription: Move | undefined;
 
     if (this.selectedTile) {
       moveDescription = this.updateBoardFromBoard(tile);
-      const completion$ = merge(
-        this.doubleClickDuringTimeout$.pipe(
-          map(() => 'doubleClick'),
-          takeUntil(timer(1000)) // Only accept within 1 second window
-        ),
-        this.selectedNewTile$.pipe(
-          take(1),
-          map(() => 'dragend')
-        )
-      ).pipe(
-        take(1),
-        takeUntil(this.destroy$)
-      );
-      completion$.subscribe((result) => {
-        if (result === 'doubleClick') {
-          tile.koma!.kind = promotePiece(tile.koma!.kind);
-          moveDescription!.promotion = true
-        }
-      });
-
-
+      if (moveDescription) { //moveDescription is defined only if valid move happened
+        moveDescription = this.handleMovePromotion(tile, moveDescription);
+      }
     }
-    if( this.selectedKomaFromHand){
+    if (this.selectedKomaFromHand) {
       moveDescription = this.updateBoardFromHand(tile);
     }
+    if (moveDescription) {
+      this.movementService.pushMovement(moveDescription);
+    }
+  }
+
+  private handleMovePromotion(tile: Tile, moveDescription: Move): Move {
+    const completion$ = merge(
+      this.doubleClickEvent$.pipe(
+        map(() => 'doubleClick'),
+        takeUntil(timer(700)) // Only accept within 700ms window
+      ),
+      this.selectedNewTile$.pipe(
+        take(1),
+        map(() => 'dragend')
+      )
+    ).pipe(
+      take(1),
+      takeUntil(this.destroy$)
+    );
+
+    completion$.subscribe((result) => {
+      if (result === 'doubleClick' && moveDescription) {
+        if (tile.koma && isKomaUnpromoted(tile.koma.kind)) {
+          tile.koma.kind = promotePiece(tile.koma.kind);
+        }
+        moveDescription.promotion = true;
+      }
+    });
+    return moveDescription;
   }
 
   handleKomaSelectFromHand(koma: Koma): void {
@@ -87,33 +100,34 @@ export class BoardComponent {
 
 
   handleTileDblClick(tile: Tile | undefined) {
-    this.doubleClickDuringTimeout$.next();
-    console.log('called doubleClickDuringTimeout$.next')// Trigger the double click subject
+    this.doubleClickEvent$.next();
   }
 
   updateBoardFromHand(tile: Tile): Move | undefined {
-    if(!this.selectedKomaFromHand || tile.koma){
+    if (!this.selectedKomaFromHand || tile.koma) {
       return;
     }
-    if(this.selectedKomaFromHand?.player=='gote'){
-      this.decreaseQuantityKoma(this.goteKomas,this.selectedKomaFromHand?.kind as KomaUnpromoted)
-    }else{
-      this.decreaseQuantityKoma(this.senteKomas,this.selectedKomaFromHand?.kind as KomaUnpromoted)
+    if (this.selectedKomaFromHand?.player == 'gote') {
+      this.decreaseQuantityKoma(this.goteKomas, this.selectedKomaFromHand?.kind as KomaType)
+    } else {
+      this.decreaseQuantityKoma(this.senteKomas, this.selectedKomaFromHand?.kind as KomaType)
     }
-    tile.koma = {kind :this.selectedKomaFromHand.kind , player:this.selectedKomaFromHand.player};
+    tile.koma = {kind: this.selectedKomaFromHand.kind, player: this.selectedKomaFromHand.player};
     this.selectedKomaFromHand = undefined;
     return {
-      piece:tile.koma,
-      movement:'*',
-      destination:{x:tile.x, y:tile.y},
+      piece: tile.koma,
+      movement: '*',
+      destination: {x: tile.x, y: tile.y},
     };
 
   }
 
-  updateBoardFromBoard( targetedTile: Tile):Move|undefined {
-    let move : movementType = '-';
+  updateBoardFromBoard(targetedTile: Tile): Move | undefined {
+    let move: movementType = '-';
     // no self move or self eating
-    if(!this.selectedTile) {return}
+    if (!this.selectedTile) {
+      return
+    }
     if (this.selectedTile.y === targetedTile.y && this.selectedTile.x === targetedTile.x) {
       return;
     }
@@ -125,20 +139,20 @@ export class BoardComponent {
     if (targetedTile.koma) {
       move = "x";
       const komaType = unPromotePiece(targetedTile.koma.kind);
-      if(targetedTile.koma.player === 'gote'){
-        this.increaseQuantityKoma(this.senteKomas,komaType);
+      if (targetedTile.koma.player === 'gote') {
+        this.increaseQuantityKoma(this.senteKomas, komaType);
       } else if (targetedTile.koma.player === 'sente') {
-        this.increaseQuantityKoma(this.goteKomas,komaType);
+        this.increaseQuantityKoma(this.goteKomas, komaType);
       }
     }
 
     // update the board
     targetedTile.koma = this.selectedTile.koma;
-    let notation : Move = {
-      piece:targetedTile.koma,
-      origin:{x:this.selectedTile.x, y:this.selectedTile.y},
-      movement:move,
-      destination:{x:targetedTile.x, y:targetedTile.y},
+    let notation: Move = {
+      piece: targetedTile.koma as Koma,
+      origin: {x: this.selectedTile.x, y: this.selectedTile.y},
+      movement: move,
+      destination: {x: targetedTile.x, y: targetedTile.y},
     };
 
     this.selectedTile.koma = undefined;
@@ -146,23 +160,21 @@ export class BoardComponent {
     return notation;
   }
 
-  private increaseQuantityKoma( komas :Map<KomaUnpromoted, number> ,  komaType: KomaUnpromoted){
+  private increaseQuantityKoma(komas: Map<KomaType, number>, komaType: KomaType) {
     const quantityInHand = (komas.get(komaType) || 0) + 1;
     komas.set(komaType, quantityInHand);
   }
 
-  private decreaseQuantityKoma( komas :Map<KomaUnpromoted, number> ,  komaType: KomaUnpromoted){
+  private decreaseQuantityKoma(komas: Map<KomaType, number>, komaType: KomaType) {
     let quantityInHand = komas.get(komaType);
-    if(quantityInHand){
+    if (quantityInHand) {
       quantityInHand -= 1;
-      if(quantityInHand ===0){
+      if (quantityInHand === 0) {
         komas.delete(komaType);
         return;
       }
       komas.set(komaType, quantityInHand);
     }
   }
-
-
 }
 

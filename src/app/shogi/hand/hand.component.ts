@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {getSvg, Koma, KomaUnpromoted, PlayerType} from '../interfaces/koma';
+import {getSvg, Koma, KomaType, PlayerType} from '../interfaces/koma';
 import {MatBadge} from '@angular/material/badge';
 
 @Component({
@@ -12,7 +12,7 @@ import {MatBadge} from '@angular/material/badge';
 })
 export class HandComponent {
   @Input() player: PlayerType = 'gote';
-  @Input() komas = new Map<KomaUnpromoted, number>([]);
+  @Input() komas = new Map<KomaType, number>([]);
   @Output() komaSelected = new EventEmitter<Koma>();
   @Output() komaUnSelected = new EventEmitter();
 

@@ -1,1 +1,13 @@
-<p>move-list works!</p>
+<ol>
+  @for (move of moves; track $index) {
+    <li>
+      <app-move
+        [destination]="move.destination"
+        [movement]="move.movement"
+        [origin]="move.origin"
+        [piece]="move.piece"
+        [promotion]="move.promotion">
+      </app-move>
+    </li>
+  }
+</ol>
