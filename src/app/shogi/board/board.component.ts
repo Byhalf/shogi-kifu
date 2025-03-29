@@ -2,15 +2,24 @@ import {Component} from '@angular/core';
 
 import {TileComponent} from '../tile/tile.component';
 import {Tile} from '../interfaces/tile';
-import {INITIAL_SHOGI_BOARD, isKomaUnpromoted, Koma, KomaType, promotePiece, unPromotePiece} from '../interfaces/koma';
+import {
+  INITIAL_SHOGI_BOARD,
+  isKomaUnpromoted,
+  Koma,
+  KomaType,
+  promotePiece,
+  unPromotePieceIfPossible
+} from '../interfaces/koma';
 import {HandComponent} from '../hand/hand.component';
 import {Move, movementType} from '../interfaces/move';
 import {map, merge, Subject, take, takeUntil, timer} from 'rxjs';
 import {MovementService} from '../services/movement.service';
+import {MatIcon} from '@angular/material/icon';
+import {MatIconButton} from '@angular/material/button';
 
 @Component({
   selector: 'shogi-board',
-  imports: [TileComponent, HandComponent],
+  imports: [TileComponent, HandComponent, MatIcon, MatIconButton, MatIconButton],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css',
 })
@@ -20,6 +29,7 @@ export class BoardComponent {
   goteKomas = new Map<KomaType, number>([]);
   private movementService: MovementService;
   private readonly size: number = 9;
+  private moves: Move[] = [];
 
   constructor(movementService: MovementService) {
     for (let y = 0; y < this.size; y++) {
@@ -29,6 +39,13 @@ export class BoardComponent {
       }
     }
     this.movementService = movementService;
+    this.movementService.moveHistory$.subscribe(
+      {
+        next: moves => {
+          this.moves = [...moves];
+        },
+      }
+    )
   }
 
 // I dislike this is not more stateless
@@ -37,7 +54,7 @@ export class BoardComponent {
   private selectedTile: Tile | undefined; //can I merge these two
   private selectedNewTile$ = new Subject<void>();
   // can I use an observable instead ?
-  private doubleClickEvent$ = new Subject<void>();
+  private doubleClickEvent$ = new Subject<Tile>();
   private destroy$ = new Subject<void>();
 
   ngOnDestroy() {
@@ -59,19 +76,23 @@ export class BoardComponent {
       moveDescription = this.updateBoardFromHand(tile);
     }
     if (moveDescription) {
+      if (tile.y < 3 && tile.koma?.player === "sente" && isKomaUnpromoted(tile.koma.kind)) {
+        moveDescription.promotion = "="
+      } else if (tile.y > 5 && tile.koma?.player === "gote" && isKomaUnpromoted(tile.koma.kind)) {
+        moveDescription.promotion = "="
+      }
       this.movementService.pushMovement(moveDescription);
     }
   }
 
   private handleMovePromotion(tile: Tile, moveDescription: Move): Move {
     const completion$ = merge(
-      this.doubleClickEvent$.pipe(
-        map(() => 'doubleClick'),
-        takeUntil(timer(700)) // Only accept within 700ms window
-      ),
       this.selectedNewTile$.pipe(
-        take(1),
-        map(() => 'dragend')
+        map(() => 'newSelect')
+      ),
+      this.doubleClickEvent$.pipe(
+        map((tile) => tile),
+        takeUntil(timer(700)) // Only accept within 700ms window
       )
     ).pipe(
       take(1),
@@ -79,11 +100,14 @@ export class BoardComponent {
     );
 
     completion$.subscribe((result) => {
-      if (result === 'doubleClick' && moveDescription) {
+      if (typeof result === typeof tile && moveDescription) {
+        const tileResult = result as Tile;
+        console.log(tileResult);
+        console.log(tile);
         if (tile.koma && isKomaUnpromoted(tile.koma.kind)) {
           tile.koma.kind = promotePiece(tile.koma.kind);
+          moveDescription.promotion = '*';
         }
-        moveDescription.promotion = true;
       }
     });
     return moveDescription;
@@ -96,11 +120,15 @@ export class BoardComponent {
   handleTileSelectFromBoard(tile: Tile) {
     this.selectedTile = tile;
     this.selectedNewTile$.next();
+    console.log("emited selectedTile");
   }
 
 
   handleTileDblClick(tile: Tile | undefined) {
-    this.doubleClickEvent$.next();
+    if (tile) {
+      this.doubleClickEvent$.next(tile);
+      console.log("doubleClick event emited");
+    }
   }
 
   updateBoardFromHand(tile: Tile): Move | undefined {
@@ -115,18 +143,20 @@ export class BoardComponent {
     tile.koma = {kind: this.selectedKomaFromHand.kind, player: this.selectedKomaFromHand.player};
     this.selectedKomaFromHand = undefined;
     return {
-      piece: tile.koma,
+      koma: tile.koma.kind,
       movement: '*',
       destination: {x: tile.x, y: tile.y},
+      player: tile.koma.player
     };
 
   }
 
   updateBoardFromBoard(targetedTile: Tile): Move | undefined {
     let move: movementType = '-';
+    let eatenKoma: KomaType | undefined = undefined;
     // no self move or self eating
-    if (!this.selectedTile) {
-      return
+    if (!this.selectedTile || !this.selectedTile.koma) {
+      return;
     }
     if (this.selectedTile.y === targetedTile.y && this.selectedTile.x === targetedTile.x) {
       return;
@@ -138,7 +168,8 @@ export class BoardComponent {
     // eat the koma
     if (targetedTile.koma) {
       move = "x";
-      const komaType = unPromotePiece(targetedTile.koma.kind);
+      eatenKoma = targetedTile.koma.kind;
+      const komaType = unPromotePieceIfPossible(targetedTile.koma.kind);
       if (targetedTile.koma.player === 'gote') {
         this.increaseQuantityKoma(this.senteKomas, komaType);
       } else if (targetedTile.koma.player === 'sente') {
@@ -149,10 +180,12 @@ export class BoardComponent {
     // update the board
     targetedTile.koma = this.selectedTile.koma;
     let notation: Move = {
-      piece: targetedTile.koma as Koma,
+      koma: this.selectedTile.koma.kind,
       origin: {x: this.selectedTile.x, y: this.selectedTile.y},
       movement: move,
       destination: {x: targetedTile.x, y: targetedTile.y},
+      player: targetedTile.koma.player,
+      ...(eatenKoma !== undefined && {eatenKoma})
     };
 
     this.selectedTile.koma = undefined;
@@ -174,6 +207,43 @@ export class BoardComponent {
         return;
       }
       komas.set(komaType, quantityInHand);
+    }
+  }
+
+  public handleUndoClick() {
+    this.undoMove(this.moves[this.moves.length - 1]);
+    this.movementService.unpushMovement();
+  }
+
+  private undoMove(move: Move) {
+    const {movement, player, koma, origin, destination, promotion, eatenKoma} = move;
+    const playerKomas = player === "sente" ? this.senteKomas : this.goteKomas;
+
+    // If move was a drop (*), remove piece from board and return it to player's pool
+    if (movement === '*') {
+      this.boardTiles[destination.y][destination.x].koma = undefined;
+      this.increaseQuantityKoma(playerKomas, koma);
+      return;
+    }
+
+    // If move was a normal move (- or x)
+    if (origin) {
+      this.boardTiles[destination.y][destination.x].koma = undefined;
+
+      // Restore the original koma, handling promotion rollback
+      this.boardTiles[origin.y][origin.x].koma = {
+        kind: promotion === '*' ? unPromotePieceIfPossible(koma) : koma,
+        player,
+      };
+
+      // If a piece was captured (x), return it to the opponent's board
+      if (movement === 'x' && eatenKoma) {
+        this.decreaseQuantityKoma(playerKomas, unPromotePieceIfPossible(eatenKoma));
+        this.boardTiles[destination.y][destination.x].koma = {
+          kind: eatenKoma,
+          player: player === "sente" ? "gote" : "sente" // Ensure ownership is flipped
+        };
+      }
     }
   }
 }

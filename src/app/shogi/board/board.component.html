@@ -18,9 +18,11 @@
               [komas]="senteKomas"
               player="sente"
               (komaSelected)="handleKomaSelectFromHand($event)"
-              >
+  >
   </shogi-hand>
-
+  <button mat-icon-button color="primary" (click)="handleUndoClick()">
+    <mat-icon>undo</mat-icon>
+  </button>
 </div>
 
 

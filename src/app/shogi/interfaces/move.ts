@@ -1,12 +1,15 @@
-import {Koma} from './koma';
+import {KomaType} from './koma';
 
 export type movementType = '-' | 'x' | '*';
+export type playerAction = Move | 'UNDO';
 
 //western notation
 export interface Move {
-  piece: Koma; //1
+  koma: KomaType; //1
   origin?: { x: number, y: number };  // 2
   movement: movementType; // 3
   destination: { x: number, y: number }; //4
-  promotion?: boolean; //5
+  promotion?: '=' | "*"; //5
+  player: "sente" | "gote";
+  eatenKoma?: KomaType;
 }

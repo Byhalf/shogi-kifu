@@ -18,9 +18,10 @@ export class HandComponent {
 
   protected readonly getSvg = getSvg;
 
-  onDragStart( koma: Koma) {
+  onDragStart(koma: Koma) {
     this.komaSelected.emit(koma);
   }
+
   onDragEnd($event: DragEvent) {
     $event.preventDefault();
     this.komaUnSelected.emit();

@@ -21,7 +21,7 @@ export function isKomaUnpromoted(koma: KomaType): koma is KomaUnpromoted {
   return unPromotedSet.has(koma as KomaUnpromoted);
 }
 
-export function unPromotePiece(komaType: KomaType): KomaType {
+export function unPromotePieceIfPossible(komaType: KomaType): KomaType {
   if (komaType === 'G' || komaType === 'K') {
     return komaType;
   }

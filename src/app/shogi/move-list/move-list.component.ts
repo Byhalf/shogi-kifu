@@ -17,16 +17,10 @@ export class MoveListComponent {
 
   constructor(movementService: MovementService) {
     this.movementService = movementService;
-    this.movementService.movementsObservable$.subscribe(
+    this.movementService.moveHistory$.subscribe(
       {
-        next: move => {
-          this.moves.push(move)
-        },
-        error(err) {
-          console.error('something wrong occurred: ' + err);
-        },
-        complete() {
-          console.log('done');
+        next: moves => {
+          this.moves = [...moves];
         },
       }
     )

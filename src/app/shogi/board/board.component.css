@@ -1,8 +1,11 @@
+:host {
+  flex: 2; /* Grid takes up more space than the list */
+}
 
 .grid-item {
-    background-color: #e6c4a4;
-    border: 1px solid rgb(168, 109, 76);
-    box-sizing: border-box;
+  background-color: #e6c4a4;
+  border: 1px solid rgb(168, 109, 76);
+  box-sizing: border-box;
   aspect-ratio: 1/1;
 
 }
@@ -19,7 +22,7 @@
   min-height: 225px;
 }
 
-.column-left{
+.column-left {
   grid-row: 1 / span 9;
   max-height: 500px;
   margin-right: 10px;
@@ -27,14 +30,14 @@
 
 }
 
-.column-right, .column-left{
+.column-right, .column-left {
   background-color: cadetblue;
   display: flex;
   flex-direction: column;
 
 }
 
-.column-right{
+.column-right {
   margin-left: 10px;
   grid-column: 11; /* Places it in the 11th column */
   grid-row: 1 / span 9; /* Spans all 9 rows */
