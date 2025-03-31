@@ -1,21 +1,22 @@
 <div class="grid-container">
   <shogi-hand class="column-left"
-              [komas]="goteKomas"
+              [komas]="shogiBoard.goteKomas"
               player="gote"
               (komaSelected)="handleKomaSelectFromHand($event)"
   >
   </shogi-hand>
-  @for (row of boardTiles; track $index) {
-    @for (tile of row; track $index) {
-      <shogi-tile class="grid-item" [tile]="tile"
-                  (tileSelected)="handleTileSelectFromBoard($event)"
-                  (tileDropped)="handleTileDrop($event)"
-                  (tileDoubleClicked)="handleTileDblClick($event)">
-      </shogi-tile>
-    }
+  @for (tile of boardView(); track $index) {
+    <shogi-tile class="grid-item"
+                [tile]="tile"
+                (tileSelected)="handleTileSelectFromBoard($event)"
+                (tileDropped)="handleTileDrop($event)"
+                (tileDoubleClicked)="handleTileDblClick($event)">
+    </shogi-tile>
   }
+
+
   <shogi-hand class="column-right"
-              [komas]="senteKomas"
+              [komas]="shogiBoard.senteKomas"
               player="sente"
               (komaSelected)="handleKomaSelectFromHand($event)"
   >

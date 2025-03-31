@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
-import {MovementService} from '../services/movement.service';
-import {Move} from '../interfaces/move';
+import {MovementService} from '../../services/movement.service';
+import {Move} from '../../interfaces/move';
 import {MoveComponent} from '../move/move.component';
 
 @Component({

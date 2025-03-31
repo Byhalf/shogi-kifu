@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {Tile} from '../interfaces/tile';
-import {getSvg} from '../interfaces/koma';
+import {Tile} from '../../interfaces/tile';
+import {getSvg} from '../../interfaces/koma';
 import {NgIf} from '@angular/common';
 import {finalize, Subject, switchMap, takeUntil, tap, timer} from 'rxjs';
 
@@ -14,9 +14,9 @@ import {finalize, Subject, switchMap, takeUntil, tap, timer} from 'rxjs';
 })
 export class TileComponent {
 
-  @Input() tile: Tile = { x: -1, y: -1 };
-  @Output() tileDropped  = new EventEmitter<{event:Event, tile:Tile}>();
-  @Output() tileSelected  = new EventEmitter<Tile>();
+  @Input() tile: Tile = {x: -1, y: -1};
+  @Output() tileDropped = new EventEmitter<{ event: Event, tile: Tile }>();
+  @Output() tileSelected = new EventEmitter<Tile>();
   @Output() tileDoubleClicked = new EventEmitter<Tile>();
 
   private drop$ = new Subject<Tile>();
@@ -51,8 +51,9 @@ export class TileComponent {
   onDrop(event: DragEvent, tile: Tile) {
     event.preventDefault();
     this.drop$.next(tile);
-    this.tileDropped.emit({event,tile});
+    this.tileDropped.emit({event, tile});
   }
+
 // required for onDrop firing
   allowDrop(event: DragEvent): void {
     event.preventDefault();

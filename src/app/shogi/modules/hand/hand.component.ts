@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {getSvg, Koma, KomaType, PlayerType} from '../interfaces/koma';
+import {getSvg, Koma, KomaType, PlayerType} from '../../interfaces/koma';
 import {MatBadge} from '@angular/material/badge';
 
 @Component({

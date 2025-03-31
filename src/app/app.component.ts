@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { BoardComponent } from './shogi/board/board.component';
-import {MoveListComponent} from './shogi/move-list/move-list.component';
+import {Component} from '@angular/core';
+import {BoardComponent} from './shogi/modules/board/board.component';
+import {MoveListComponent} from './shogi/modules/move-list/move-list.component';
 
 @Component({
   selector: 'app-root',
