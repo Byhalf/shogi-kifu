@@ -21,7 +21,19 @@ export function isKomaUnpromoted(koma: KomaType): koma is KomaUnpromoted {
   return unPromotedSet.has(koma as KomaUnpromoted);
 }
 
-export function unPromotePieceIfPossible(komaType: KomaType): KomaType {
+export function swapPlayer(player: PlayerType): PlayerType;
+export function swapPlayer(koma: Koma): Koma;
+
+export function swapPlayer(arg: PlayerType | Koma): PlayerType | Koma {
+  if (typeof arg === "string") {
+    return arg === "sente" ? "gote" : "sente"; // Swap PlayerType
+  } else {
+    arg.player = swapPlayer(arg.player); // Swap Koma player
+    return arg;
+  }
+}
+
+export function unPromotePiece(komaType: KomaType): KomaType {
   if (komaType === 'G' || komaType === 'K') {
     return komaType;
   }

@@ -4,13 +4,13 @@ export const MovementType = {
   MOVE: '-',
   CAPTURE: 'x',
   DROP: '*',
-  PROMOTE: '+'
+  PROMOTE: '+',
+  UNDO: '/'
 } as const;
 
 // Type derived from the object's values
 export type movementType = typeof MovementType[keyof typeof MovementType];
 
-export type playerAction = Move | 'UNDO';
 
 //western notation
 export interface Move {

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {scan, Subject} from 'rxjs';
-import {Move} from '../interfaces/move';
+import {Move, MovementType} from '../interfaces/move';
 
 @Injectable({
   providedIn: 'root'
@@ -13,21 +13,17 @@ export class MovementService {
 
 
   public moveHistory$ = this.movements$.pipe(
-    scan((history: Move[], action) => {
-      if (typeof action === 'string' && action === 'UNDO') {
+    scan((history: Move[], move) => {
+      if (move.movement === MovementType.UNDO) {
         return history.slice(0, -1); // Remove last move (undo)
       } else {
-        return [...history, action]; // Add move to history
+        return [...history, move]; // Add move to history
       }
     }, [] as Move[])
   );
 
   constructor() {
   }
-
-  /*unpushMovement() {
-    this.movements$.next("UNDO");
-  }*/
 
   pushMovement(move: Move) {
     this.movements$.next(move);

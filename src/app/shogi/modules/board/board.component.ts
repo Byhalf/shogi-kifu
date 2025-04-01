@@ -2,9 +2,9 @@ import {Component, computed, DestroyRef, Signal} from '@angular/core';
 
 import {TileComponent} from '../tile/tile.component';
 import {Tile} from '../../interfaces/tile';
-import {Koma, promotePiece} from '../../interfaces/koma';
+import {Koma, promotePiece, swapPlayer, unPromotePiece} from '../../interfaces/koma';
 import {HandComponent} from '../hand/hand.component';
-import {Move} from '../../interfaces/move';
+import {Move, MovementType} from '../../interfaces/move';
 import {MovementService} from '../../services/movement.service';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
@@ -82,10 +82,40 @@ export class BoardComponent {
         }
       )
     });
+
+
   }
 
+  public handleUndoClick(): void {
+    this.shogiBoard.undoMovement();
+  }
 
-  public applyMove(move: Move) {
+  private undoMove(move: Move): void {
+    if (move.origin) {
+      let oldTile: Tile = {
+        koma: {
+          player: move.player,
+          kind: move.promotion === "*" ?
+            unPromotePiece(move.koma) : move.koma
+        },
+        x: move.origin.x,
+        y: move.origin.y
+      }
+      this.boardView()[oldTile.x * 9 + oldTile.y] = oldTile;
+    }
+    this.boardView()[move.destination.x * 9 + move.destination.y]
+      = move.eatenKoma ?
+      {
+        x: move.destination.x, y: move.destination.y,
+        koma: {
+          kind: move.eatenKoma,
+          player: swapPlayer(move.player)
+        }
+      }
+      : {x: move.destination.x, y: move.destination.y};
+  }
+
+  private makeMove(move: Move): void {
     let newTile: Tile = {
       koma: {
         player: move.player,
@@ -94,9 +124,18 @@ export class BoardComponent {
       },
       x: move.destination.x, y: move.destination.y
     };
-    this.boardView()[newTile.x * 9 + newTile.y] = (newTile);
+    this.boardView()[newTile.x * 9 + newTile.y] = newTile;
     if (move.origin) {
       this.boardView()[move.origin.x * 9 + move.origin.y] = {x: move.origin.x, y: move.origin.y};
+    }
+  }
+
+
+  private applyMove(move: Move) {
+    if (move.movement === MovementType.UNDO) {
+      this.undoMove(move);
+    } else {
+      this.makeMove(move);
     }
   }
 

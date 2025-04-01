@@ -7,11 +7,10 @@ import {Koma} from '../interfaces/koma';
   providedIn: 'root'
 })
 export class BoardEventBusServiceService {
-  // Selection sources
+  //  sources
   private tileSelected = new Subject<Tile>();
   private komaSelected = new Subject<Koma>();
   private promoteKoma = new Subject<Tile>();
-  // Drop
   private tileDropped = new Subject<Tile>();
 
   private cancellations = merge(this.tileSelected, this.komaSelected);

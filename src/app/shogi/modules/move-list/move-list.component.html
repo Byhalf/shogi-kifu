@@ -1,5 +1,5 @@
 <ol>
-  @for (move of moves; track $index) {
+  @for (move of movesHistory$ | async; track $index) {
     <li>
       <app-move
         [destination]="move.destination"
