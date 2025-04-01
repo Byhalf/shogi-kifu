@@ -1,6 +1,5 @@
 @for (koma of komas; track $index) {
   <span matBadge="{{koma[1]}}"
-        (dragend)="onDragEnd($event)"
   >
   <img [src]="getSvg(koma[0],this.player)"
        (dragstart)="onDragStart({kind:koma[0],player:this.player})"

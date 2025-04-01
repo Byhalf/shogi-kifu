@@ -111,6 +111,8 @@ export class ShogiBoard {
       return;
     }
     this.decreaseQuantityKoma(koma);
+    console.log(toTile)
+    console.log(toTile.y)
 
     this.boardTiles[toTile.y][toTile.x] = {kind: koma.kind, player: koma.player};
     this.movementService.pushMovement({
@@ -123,7 +125,6 @@ export class ShogiBoard {
 
   private isLegallyPromotable(fromTile: Tile, toTile: Tile): boolean {
     if (fromTile.koma && isKomaUnpromoted(fromTile.koma.kind)) {
-      console.log(fromTile, toTile);
       if (fromTile.koma.player === "gote" && (fromTile.y > 5 || toTile.y > 5)) {
         return true;
       }

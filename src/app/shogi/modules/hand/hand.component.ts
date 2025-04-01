@@ -2,7 +2,6 @@ import {Component, Input} from '@angular/core';
 import {getSvg, Koma, KomaType, PlayerType} from '../../interfaces/koma';
 import {MatBadge} from '@angular/material/badge';
 import {BoardEventBusServiceService} from '../../services/board-event-bus-service.service';
-import {Tile} from '../../interfaces/tile';
 
 @Component({
   selector: 'shogi-hand',
@@ -27,7 +26,4 @@ export class HandComponent {
     this.boardEventBusService.selectKoma(koma);
   }
 
-  onDragEnd(tile: Tile) {
-    this.boardEventBusService.dropOnTile(tile);
-  }
 }
