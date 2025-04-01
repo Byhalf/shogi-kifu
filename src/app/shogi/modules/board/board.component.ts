@@ -37,14 +37,13 @@ export class BoardComponent {
   private convertBoardToBoardView(board: (Koma | undefined)[][]): Signal<Tile[]> {
     return computed(() => {
       const tiles: Tile[] = [];
-      for (let x = 0; x < board.length; x++) {
+      for (let y = 0; y < 9; y++) {
         // Safety check for undefined rows
-        if (!board[x]) continue;
-        for (let y = 0; y < board[x].length; y++) {
+        for (let x = 0; x < 9; x++) {
           tiles.push({
             x,
             y,
-            koma: board[x][y]
+            koma: board[y][x]
           });
         }
       }
@@ -101,9 +100,9 @@ export class BoardComponent {
         x: move.origin.x,
         y: move.origin.y
       }
-      this.boardView()[oldTile.x * 9 + oldTile.y] = oldTile;
+      this.boardView()[this.oneDtoTwoD(oldTile.x, oldTile.y)] = oldTile;
     }
-    this.boardView()[move.destination.x * 9 + move.destination.y]
+    this.boardView()[this.oneDtoTwoD(move.destination.x, move.destination.y)]
       = move.eatenKoma ?
       {
         x: move.destination.x, y: move.destination.y,
@@ -124,9 +123,9 @@ export class BoardComponent {
       },
       x: move.destination.x, y: move.destination.y
     };
-    this.boardView()[newTile.x * 9 + newTile.y] = newTile;
+    this.boardView()[this.oneDtoTwoD(newTile.x, newTile.y)] = newTile;
     if (move.origin) {
-      this.boardView()[move.origin.x * 9 + move.origin.y] = {x: move.origin.x, y: move.origin.y};
+      this.boardView()[this.oneDtoTwoD(move.origin.x, move.origin.y)] = {x: move.origin.x, y: move.origin.y};
     }
   }
 
@@ -139,5 +138,8 @@ export class BoardComponent {
     }
   }
 
+  private oneDtoTwoD(x: number, y: number): number {
+    return y * 9 + x;
+  }
 }
 

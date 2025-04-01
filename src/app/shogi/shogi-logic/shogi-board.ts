@@ -79,7 +79,7 @@ export class ShogiBoard {
 
   moveKomaOnBoard(fromTile: Tile, toTile: Tile) {
     let moveType: movementType = '-';
-    let promotion: '=' | "*" | undefined = this.canKomaBePromotedLegally(fromTile, toTile) ? '=' : undefined;
+    let promotion: '=' | "*" | undefined = this.isLegallyPromotable(fromTile, toTile) ? '=' : undefined;
     let eatenKoma: KomaType | undefined = undefined;
     if (!fromTile.koma || fromTile.koma.player === toTile.koma?.player) {
       return undefined;
@@ -121,13 +121,13 @@ export class ShogiBoard {
     });
   }
 
-  private canKomaBePromotedLegally(fromTile: Tile, toTile: Tile): boolean {
+  private isLegallyPromotable(fromTile: Tile, toTile: Tile): boolean {
     if (fromTile.koma && isKomaUnpromoted(fromTile.koma.kind)) {
-
-      if (fromTile.koma.player === "sente" && (fromTile.y < 3) || (toTile.y < 3)) {
+      console.log(fromTile, toTile);
+      if (fromTile.koma.player === "gote" && (fromTile.y > 5 || toTile.y > 5)) {
         return true;
       }
-      if (fromTile.koma.player === "gote" && (fromTile.y > 5) || (toTile.y < 5)) {
+      if (fromTile.koma.player === "sente" && (fromTile.y < 3 || toTile.y < 3)) {
         return true;
       }
     }

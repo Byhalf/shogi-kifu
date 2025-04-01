@@ -68,7 +68,6 @@ export class BoardEventBusServiceService {
   }
 
   promoteKomaAttempt(tile: Tile) {
-    console.log("event bus received double click")
     this.promoteKoma.next(tile);
   }
 
