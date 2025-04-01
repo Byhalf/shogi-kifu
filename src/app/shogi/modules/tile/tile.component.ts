@@ -3,6 +3,7 @@ import {Tile} from '../../interfaces/tile';
 import {getSvg} from '../../interfaces/koma';
 import {NgIf} from '@angular/common';
 import {finalize, Subject, switchMap, takeUntil, tap, timer} from 'rxjs';
+import {BoardEventBusServiceService} from '../../services/board-event-bus-service.service';
 
 @Component({
   selector: 'shogi-tile',
@@ -15,14 +16,15 @@ import {finalize, Subject, switchMap, takeUntil, tap, timer} from 'rxjs';
 export class TileComponent {
 
   @Input() tile: Tile = {x: -1, y: -1};
-  @Output() tileDropped = new EventEmitter<{ event: Event, tile: Tile }>();
-  @Output() tileSelected = new EventEmitter<Tile>();
   @Output() tileDoubleClicked = new EventEmitter<Tile>();
 
   private drop$ = new Subject<Tile>();
   private doubleClick$ = new Subject<Tile>();
+  boardEventBusService: BoardEventBusServiceService;
 
-  constructor() {
+  constructor(boardEventBusService: BoardEventBusServiceService) {
+    this.boardEventBusService = boardEventBusService;
+
     this.drop$
       .pipe(
         switchMap((tile) =>
@@ -44,14 +46,14 @@ export class TileComponent {
   }
 
 
-  onDragStart(event: DragEvent, tile: Tile) {
-    this.tileSelected.emit(tile);
+  onDragStart(tile: Tile) {
+    this.boardEventBusService.selectTile(tile);
   }
 
   onDrop(event: DragEvent, tile: Tile) {
     event.preventDefault();
     this.drop$.next(tile);
-    this.tileDropped.emit({event, tile});
+    this.boardEventBusService.dropOnTile(tile);
   }
 
 // required for onDrop firing
@@ -62,6 +64,6 @@ export class TileComponent {
   protected readonly getSvg = getSvg;
 
   onDoubleClick(tile: Tile) {
-    this.doubleClick$.next(tile);
+    this.boardEventBusService.promoteKomaAttempt(tile);
   }
 }

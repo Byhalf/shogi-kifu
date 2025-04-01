@@ -1,6 +1,15 @@
 import {KomaType} from './koma';
 
-export type movementType = '-' | 'x' | '*';
+export const MovementType = {
+  MOVE: '-',
+  CAPTURE: 'x',
+  DROP: '*',
+  PROMOTE: '+'
+} as const;
+
+// Type derived from the object's values
+export type movementType = typeof MovementType[keyof typeof MovementType];
+
 export type playerAction = Move | 'UNDO';
 
 //western notation

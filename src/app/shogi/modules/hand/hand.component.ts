@@ -1,6 +1,8 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {getSvg, Koma, KomaType, PlayerType} from '../../interfaces/koma';
 import {MatBadge} from '@angular/material/badge';
+import {BoardEventBusServiceService} from '../../services/board-event-bus-service.service';
+import {Tile} from '../../interfaces/tile';
 
 @Component({
   selector: 'shogi-hand',
@@ -13,17 +15,19 @@ import {MatBadge} from '@angular/material/badge';
 export class HandComponent {
   @Input() player: PlayerType = 'gote';
   @Input() komas = new Map<KomaType, number>([]);
-  @Output() komaSelected = new EventEmitter<Koma>();
-  @Output() komaUnSelected = new EventEmitter();
+  boardEventBusService: BoardEventBusServiceService;
 
   protected readonly getSvg = getSvg;
 
-  onDragStart(koma: Koma) {
-    this.komaSelected.emit(koma);
+  constructor(boardEventBusService: BoardEventBusServiceService) {
+    this.boardEventBusService = boardEventBusService;
   }
 
-  onDragEnd($event: DragEvent) {
-    $event.preventDefault();
-    this.komaUnSelected.emit();
+  onDragStart(koma: Koma) {
+    this.boardEventBusService.selectKoma(koma);
+  }
+
+  onDragEnd(tile: Tile) {
+    this.boardEventBusService.dropOnTile(tile);
   }
 }

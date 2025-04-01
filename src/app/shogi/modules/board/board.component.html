@@ -2,15 +2,12 @@
   <shogi-hand class="column-left"
               [komas]="shogiBoard.goteKomas"
               player="gote"
-              (komaSelected)="handleKomaSelectFromHand($event)"
+
   >
   </shogi-hand>
   @for (tile of boardView(); track $index) {
     <shogi-tile class="grid-item"
-                [tile]="tile"
-                (tileSelected)="handleTileSelectFromBoard($event)"
-                (tileDropped)="handleTileDrop($event)"
-                (tileDoubleClicked)="handleTileDblClick($event)">
+                [tile]="tile">
     </shogi-tile>
   }
 
@@ -18,10 +15,9 @@
   <shogi-hand class="column-right"
               [komas]="shogiBoard.senteKomas"
               player="sente"
-              (komaSelected)="handleKomaSelectFromHand($event)"
   >
   </shogi-hand>
-  <button mat-icon-button color="primary" (click)="handleUndoClick()">
+  <button mat-icon-button color="primary">
     <mat-icon>undo</mat-icon>
   </button>
 </div>

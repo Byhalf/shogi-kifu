@@ -1,6 +1,6 @@
 import {isKomaUnpromoted, Koma, KomaType, promotePiece, unPromotePieceIfPossible} from '../interfaces/koma';
 import {Tile} from '../interfaces/tile';
-import {Move, movementType} from '../interfaces/move';
+import {Move, MovementType, movementType} from '../interfaces/move';
 import {MovementService} from '../services/movement.service';
 
 // should I make this a service to inject movementService ?
@@ -114,8 +114,7 @@ export class ShogiBoard {
     });
   }
 
-  canKomaBePromotedLegally(fromTile: Tile, toTile: Tile): boolean {
-    console.log(fromTile);
+  private canKomaBePromotedLegally(fromTile: Tile, toTile: Tile): boolean {
     if (fromTile.koma && isKomaUnpromoted(fromTile.koma.kind)) {
 
       if (fromTile.koma.player === "sente" && (fromTile.y < 3) || (toTile.y < 3)) {
@@ -128,45 +127,16 @@ export class ShogiBoard {
     return false;
   }
 
-  promoteKoma(tile: Tile, move: Move): Move {
-    if (tile.koma && isKomaUnpromoted(tile.koma.kind)) {
-      this.boardTiles[tile.y][tile.x] = {kind: promotePiece(tile.koma.kind), player: tile.koma.player};
-      move.promotion = '*';
+  promoteKoma(toTile: Tile): void {
+    if (toTile.koma && isKomaUnpromoted(toTile.koma.kind)) {
+      this.boardTiles[toTile.y][toTile.x] = {kind: promotePiece(toTile.koma.kind), player: toTile.koma.player};
+      this.movementService.pushMovement({
+        koma: toTile.koma.kind,
+        movement: MovementType.PROMOTE,
+        destination: {x: toTile.x, y: toTile.y},
+        player: toTile.koma.player,
+        promotion: "*"
+      })
     }
-    return move;
-  }
-
-
-  public undoMove(move: Move) {
-    const {movement, player, koma, origin, destination, promotion, eatenKoma} = move;
-
-    // If move was a drop (*), remove piece from board and return it to player's pool
-    if (movement === '*') {
-      this.boardTiles[destination.y][destination.x] = undefined;
-      this.increaseQuantityKoma({player, kind: koma});
-      return;
-    }
-
-    // If move was a normal move (- or x)
-    if (origin) {
-      this.boardTiles[destination.y][destination.x] = undefined;
-
-      // Restore the original koma, handling promotion rollback
-      this.boardTiles[origin.y][origin.x] = {
-        kind: promotion === '*' ? unPromotePieceIfPossible(koma) : koma,
-        player,
-      };
-
-      // If a piece was captured (x), return it to the opponent's board
-      if (movement === 'x' && eatenKoma) {
-        this.decreaseQuantityKoma({player: player === "sente" ? "gote" : "sente", kind: eatenKoma});
-        this.boardTiles[destination.y][destination.x] = {
-          kind: eatenKoma,
-          player: player === "sente" ? "gote" : "sente" // Ensure ownership is flipped
-        };
-      }
-    }
-    this.movementService.unpushMovement();
-
   }
 }

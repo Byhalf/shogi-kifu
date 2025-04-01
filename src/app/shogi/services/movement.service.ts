@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {scan, Subject} from 'rxjs';
-import {Move, playerAction} from '../interfaces/move';
+import {Move} from '../interfaces/move';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +9,8 @@ import {Move, playerAction} from '../interfaces/move';
 export class MovementService {
 
 
-  private movements$ = new Subject<playerAction>();
+  public movements$ = new Subject<Move>();
+
 
   public moveHistory$ = this.movements$.pipe(
     scan((history: Move[], action) => {
@@ -24,9 +25,9 @@ export class MovementService {
   constructor() {
   }
 
-  unpushMovement() {
+  /*unpushMovement() {
     this.movements$.next("UNDO");
-  }
+  }*/
 
   pushMovement(move: Move) {
     this.movements$.next(move);

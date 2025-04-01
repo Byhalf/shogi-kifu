@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {map, Subject, switchMap, takeUntil} from 'rxjs';
+import {EMPTY, exhaustMap, filter, map, merge, mergeMap, Subject, switchMap, take, takeUntil, timer} from 'rxjs';
 import {Tile} from '../interfaces/tile';
 import {Koma} from '../interfaces/koma';
 
@@ -10,16 +10,18 @@ export class BoardEventBusServiceService {
   // Selection sources
   private tileSelected = new Subject<Tile>();
   private komaSelected = new Subject<Koma>();
+  private promoteKoma = new Subject<Tile>();
+  // Drop
+  private tileDropped = new Subject<Tile>();
 
-  // Drop source
-  private tileDropped = new Subject<{ from: Tile | Koma, to: Tile }>();
+  private cancellations = merge(this.tileSelected, this.komaSelected);
 
   // Combined move stream
   moveAttempt$ = this.tileSelected.pipe(
     switchMap(selectedTile =>
       this.tileDropped.pipe(
-        takeUntil(this.tileSelected || this.komaSelected), // Reset if new selection occurs
-        map(({to}) => ({
+        takeUntil(this.cancellations), // Reset if new selection occurs
+        map((to) => ({
           from: selectedTile,
           to
         }))
@@ -27,12 +29,26 @@ export class BoardEventBusServiceService {
     )
   );
 
+  promotionAttempt$ = this.moveAttempt$.pipe(
+    exhaustMap((move) => {
+        return merge(
+          this.promoteKoma.pipe(
+            filter(koma => koma.x === move.to.x && koma.y === move.to.y),
+            take(1)
+          ),
+          timer(1000).pipe(mergeMap(() => EMPTY))
+        ).pipe(
+          takeUntil(this.cancellations),
+        );
+      }
+    )
+  )
   // Koma-specific move stream
   komaMoveAttempt$ = this.komaSelected.pipe(
     switchMap(selectedKoma =>
       this.tileDropped.pipe(
-        takeUntil(this.komaSelected || this.tileSelected), // Reset if new selection occurs
-        map(({to}) => ({
+        takeUntil(this.cancellations), // Reset if new selection occurs
+        map((to) => ({
           koma: selectedKoma,
           to
         }))
@@ -48,8 +64,13 @@ export class BoardEventBusServiceService {
     this.komaSelected.next(koma);
   }
 
-  dropOnTile(from: Tile | Koma, to: Tile) {
-    this.tileDropped.next({from, to});
+  dropOnTile(to: Tile) {
+    this.tileDropped.next(to);
+  }
+
+  promoteKomaAttempt(tile: Tile) {
+    console.log("event bus received double click")
+    this.promoteKoma.next(tile);
   }
 
   constructor() {

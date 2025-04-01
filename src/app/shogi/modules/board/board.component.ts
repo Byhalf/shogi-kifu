@@ -5,12 +5,11 @@ import {Tile} from '../../interfaces/tile';
 import {Koma, promotePiece} from '../../interfaces/koma';
 import {HandComponent} from '../hand/hand.component';
 import {Move} from '../../interfaces/move';
-import {map, merge, Subject, take, takeUntil, timer} from 'rxjs';
 import {MovementService} from '../../services/movement.service';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
 import {ShogiBoard} from '../../shogi-logic/shogi-board';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {BoardEventBusServiceService} from '../../services/board-event-bus-service.service';
 
 @Component({
   selector: 'shogi-board',
@@ -24,17 +23,13 @@ export class BoardComponent {
   protected shogiBoard: ShogiBoard;
   private readonly destroyRef: DestroyRef;
   protected boardView: Signal<Tile[]>;
-// I dislike this is not more stateless
-  // I don't like that it's different Types koma/tile
-  private selectedKomaFromHand: Koma | undefined;
-  private selectedTile: Tile | undefined; //can I merge these two
-  private selectedNewTile$ = new Subject<void>();
-  private doubleClickEvent$ = new Subject<Tile>();
+  private boardEventBusService: BoardEventBusServiceService;
 
-  constructor(movementService: MovementService, destroyRef: DestroyRef) {
+  constructor(movementService: MovementService, boardEventBusService: BoardEventBusServiceService, destroyRef: DestroyRef) {
     this.movementService = movementService;
     this.destroyRef = destroyRef;
     this.shogiBoard = new ShogiBoard(movementService);
+    this.boardEventBusService = boardEventBusService;
     this.boardView = this.convertBoardToBoardView(this.shogiBoard.boardTiles);
 
   }
@@ -57,63 +52,52 @@ export class BoardComponent {
     });
   }
 
-
-  handleTileDrop(eventData: { event: Event, tile: Tile }): void {
-    const {event, tile} = eventData;
-
-
-  }
-
-  private handleMovePromotion(tile: Tile, moveDescription: Move): Move {
-    const completion$ = merge(
-      this.selectedNewTile$.pipe(
-        map(() => 'newSelect')
-      ),
-      this.doubleClickEvent$.pipe(
-        takeUntil(timer(700)) // Only accept within 700ms window
-      )
-    ).pipe(
-      take(1),
-      takeUntilDestroyed(this.destroyRef)
-    );
-
-    completion$.subscribe((result) => {
-      if (typeof result === typeof tile && moveDescription) {
-        moveDescription = this.shogiBoard.promoteKoma(tile, moveDescription);
-        if (tile.koma && moveDescription.promotion === "*") {
-          tile.koma.kind = promotePiece(tile.koma.kind);
-        }
-
+  ngOnInit() {
+    // Handle tile moves
+    this.boardEventBusService.moveAttempt$.subscribe({
+      next: ({from, to}) => {
+        this.shogiBoard.moveKomaOnBoard(from, to);
       }
     });
-    return moveDescription;
+
+    // Handle koma moves
+    this.boardEventBusService.komaMoveAttempt$.subscribe({
+      next: ({koma, to}) => {
+        this.shogiBoard.dropKomaFromHand(koma, to);
+      }
+    });
+
+    this.boardEventBusService.promotionAttempt$.subscribe(
+      {
+        next: (tile) => {
+          this.shogiBoard.promoteKoma(tile);
+        }
+      }
+    )
+
+    //update view
+    this.movementService.movements$.subscribe({
+      next: ((move: Move) => {
+          this.applyMove(move);
+        }
+      )
+    });
   }
 
-  handleKomaSelectFromHand(koma: Koma): void {
-    this.selectedKomaFromHand = koma;
-  }
 
-  handleTileSelectFromBoard(tile: Tile) {
-    this.selectedTile = tile;
-    this.selectedNewTile$.next();
-  }
-
-
-  handleTileDblClick(tile: Tile | undefined) {
-    if (tile) {
-      this.doubleClickEvent$.next(tile);
+  public applyMove(move: Move) {
+    let newTile: Tile = {
+      koma: {
+        player: move.player,
+        kind: move.promotion === "*" ?
+          promotePiece(move.koma) : move.koma
+      },
+      x: move.destination.x, y: move.destination.y
+    };
+    this.boardView()[newTile.x * 9 + newTile.y] = (newTile);
+    if (move.origin) {
+      this.boardView()[move.origin.x * 9 + move.origin.y] = {x: move.origin.x, y: move.origin.y};
     }
-  }
-
-  updateBoardFromHand(tile: Tile) {
-    this.shogiBoard.dropKomaFromHand(this.selectedKomaFromHand, tile);
-
-
-  }
-
-
-  public handleUndoClick() {
-
   }
 
 }
