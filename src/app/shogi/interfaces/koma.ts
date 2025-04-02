@@ -47,6 +47,22 @@ export function promotePiece(komaType: KomaType): KomaType {
   return komaType.toUpperCase() as KomaPromoted;
 }
 
+export const LATIN_TO_CSA: Record<string, string> = {
+  p: 'FU',    // Pawn (unpromoted)
+  P: 'TO',    // Promoted Pawn
+  l: 'KY',    // Lance (unpromoted)
+  L: 'NY',   // Promoted Lance
+  n: 'KE',    // Knight (unpromoted)
+  N: 'NK',   // Promoted Knight
+  s: 'GI',    // Silver General (unpromoted)
+  S: 'NG',   // Promoted Silver General
+  G: 'KI',    // Gold General (promoted)
+  b: 'KA',    // Bishop (unpromoted)
+  B: 'UM', // Promoted Bishop (Horse)
+  r: 'HI',    // Rook (unpromoted)
+  R: 'RY',// Promoted Rook (Dragon)
+  K: 'OU',    // King
+}
 
 export const KOMA_SVG_MAP: Record<string, string> = {
   'p_sente': 'assets/koma/0FU.svg',
