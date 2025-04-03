@@ -3,7 +3,7 @@ import {Tile} from '../../interfaces/tile';
 import {getSvg} from '../../interfaces/koma';
 import {NgIf} from '@angular/common';
 import {finalize, Subject, switchMap, takeUntil, tap, timer} from 'rxjs';
-import {BoardEventBusServiceService} from '../../services/board-event-bus-service.service';
+import {BoardEventBusServiceService} from '../../services/event-services/board-event-bus-service.service';
 
 @Component({
   selector: 'shogi-tile',

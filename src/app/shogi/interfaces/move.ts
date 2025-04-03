@@ -11,6 +11,10 @@ export const MovementType = {
 // Type derived from the object's values
 export type movementType = typeof MovementType[keyof typeof MovementType];
 
+export interface basicMove {
+  from: { x: number, y: number };
+  to: { x: number, y: number };
+}
 
 //western notation
 export interface Move {

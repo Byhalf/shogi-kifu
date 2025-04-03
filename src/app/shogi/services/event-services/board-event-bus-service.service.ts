@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {EMPTY, exhaustMap, filter, map, merge, mergeMap, Subject, switchMap, take, takeUntil, timer} from 'rxjs';
-import {Tile} from '../interfaces/tile';
-import {Koma} from '../interfaces/koma';
+import {Tile} from '../../interfaces/tile';
+import {Koma} from '../../interfaces/koma';
 
 @Injectable({
   providedIn: 'root'

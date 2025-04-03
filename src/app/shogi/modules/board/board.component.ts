@@ -5,11 +5,11 @@ import {Tile} from '../../interfaces/tile';
 import {Koma, promotePiece, swapPlayer, unPromotePiece} from '../../interfaces/koma';
 import {HandComponent} from '../hand/hand.component';
 import {Move, MovementType} from '../../interfaces/move';
-import {MovementService} from '../../services/movement.service';
+import {MovementService} from '../../services/event-services/movement.service';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
-import {ShogiBoard} from '../../shogi-logic/shogi-board';
-import {BoardEventBusServiceService} from '../../services/board-event-bus-service.service';
+import {ShogiBoard} from '../../services/shogi-logic/shogi-board';
+import {BoardEventBusServiceService} from '../../services/event-services/board-event-bus-service.service';
 
 @Component({
   selector: 'shogi-board',
@@ -25,10 +25,10 @@ export class BoardComponent {
   protected boardView: Signal<Tile[]>;
   private boardEventBusService: BoardEventBusServiceService;
 
-  constructor(movementService: MovementService, boardEventBusService: BoardEventBusServiceService, destroyRef: DestroyRef) {
+  constructor(movementService: MovementService, boardEventBusService: BoardEventBusServiceService, shogiBoard: ShogiBoard, destroyRef: DestroyRef) {
     this.movementService = movementService;
     this.destroyRef = destroyRef;
-    this.shogiBoard = new ShogiBoard(movementService);
+    this.shogiBoard = shogiBoard;
     this.boardEventBusService = boardEventBusService;
     this.boardView = this.convertBoardToBoardView(this.shogiBoard.boardTiles);
 

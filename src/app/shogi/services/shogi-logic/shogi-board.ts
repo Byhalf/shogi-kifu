@@ -1,15 +1,19 @@
-import {isKomaUnpromoted, Koma, KomaType, promotePiece, swapPlayer, unPromotePiece} from '../interfaces/koma';
-import {Tile} from '../interfaces/tile';
-import {Move, MovementType, movementType} from '../interfaces/move';
-import {MovementService} from '../services/movement.service';
+import {isKomaUnpromoted, Koma, KomaType, promotePiece, swapPlayer, unPromotePiece} from '../../interfaces/koma';
+import {Tile} from '../../interfaces/tile';
+import {Move, MovementType, movementType} from '../../interfaces/move';
+import {MovementService} from '../event-services/movement.service';
+import {ShogiConverter} from './shogi-converter';
+import {Injectable} from '@angular/core';
 
-// should I make this a service to inject movementService ?
+@Injectable({
+  providedIn: 'root'
+})
 export class ShogiBoard {
   boardTiles: (Koma | undefined)[][] = [];
   senteKomas = new Map<KomaType, number>([]);
   goteKomas = new Map<KomaType, number>([]);
   movementService: MovementService;
-  private movesHistory: Move[] | undefined;
+  private movesHistory: Move[] = [];
 
 
   constructor(movementService: MovementService) {
@@ -177,5 +181,11 @@ export class ShogiBoard {
     }
 
   }
+
+
+  exportGameToCsa(): string {
+    return ShogiConverter.gameToCSA(this.boardTiles, this.movesHistory);
+  }
+
 
 }

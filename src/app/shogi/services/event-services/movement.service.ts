@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {scan, Subject} from 'rxjs';
-import {Move, MovementType} from '../interfaces/move';
+import {Move, MovementType} from '../../interfaces/move';
 
 @Injectable({
   providedIn: 'root'
