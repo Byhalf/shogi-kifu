@@ -23,7 +23,7 @@ export class ShogiConverter {
   }
 
   private static moveToCSA(move: Move, firstPlayer: PlayerType): string {
-    let result = firstPlayer === move.player ? "+" : " - ";
+    let result = firstPlayer === move.player ? "+" : "-";
     result += move.origin ? ShogiConverter.realCoordinatesToCSA(move.origin.x, move.origin.y) : "00"
     result += ShogiConverter.realCoordinatesToCSA(move.destination.x, move.destination.y);
     result += move.promotion === "*" ? LATIN_TO_CSA[promotePiece(move.koma)] : LATIN_TO_CSA[move.koma];
@@ -31,7 +31,7 @@ export class ShogiConverter {
   }
 
   private static realCoordinatesToCSA(x: number, y: number): string {
-    return `${9 - x}${9 - y}`;
+    return `${9 - x}${y + 1}`;
   }
 
   public static gameToCSA(state: (Koma | undefined)[][], moves: Move[]): string {
@@ -42,7 +42,7 @@ export class ShogiConverter {
     let result = "";
     result += ShogiConverter.boardStateToCSA(state, firstPlayer);
     result += "\n+\n";
-    result += moves.reduce((result, move) => {
+    result = moves.reduce((result, move) => {
       return result + ShogiConverter.moveToCSA(move, firstPlayer) + "\n";
     }, result)
     return result + "%TORYO";

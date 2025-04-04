@@ -1,4 +1,12 @@
-import {isKomaUnpromoted, Koma, KomaType, promotePiece, swapPlayer, unPromotePiece} from '../../interfaces/koma';
+import {
+  INITIAL_BOARD,
+  isKomaUnpromoted,
+  Koma,
+  KomaType,
+  promotePiece,
+  swapPlayer,
+  unPromotePiece
+} from '../../interfaces/koma';
 import {Tile} from '../../interfaces/tile';
 import {Move, MovementType, movementType} from '../../interfaces/move';
 import {MovementService} from '../event-services/movement.service';
@@ -18,46 +26,15 @@ export class ShogiBoard {
 
   constructor(movementService: MovementService) {
     this.movementService = movementService;
+    this.boardTiles = INITIAL_BOARD.map(row =>
+      row.map(cell => (cell ? {...cell} : undefined))
+    );
     this.movementService.moveHistory$.subscribe(
       {
         next: moves => this.movesHistory = moves
       }
     )
-    this.boardTiles = [[
-      {kind: 'l', player: 'gote'}, {kind: 'n', player: 'gote'}, {kind: 's', player: 'gote'},
-      {kind: 'G', player: 'gote'}, {kind: 'K', player: 'gote'}, {kind: 'G', player: 'gote'},
-      {kind: 's', player: 'gote'}, {kind: 'n', player: 'gote'}, {kind: 'l', player: 'gote'}
-    ],
-      [
-        undefined, {kind: 'r', player: 'gote'}, undefined, undefined, undefined, undefined, undefined,
-        {kind: 'b', player: 'gote'}, undefined
-      ],
-      [
-        {kind: 'p', player: 'gote'}, {kind: 'p', player: 'gote'}, {kind: 'p', player: 'gote'},
-        {kind: 'p', player: 'gote'}, {kind: 'p', player: 'gote'}, {kind: 'p', player: 'gote'},
-        {kind: 'p', player: 'gote'}, {kind: 'p', player: 'gote'}, {kind: 'p', player: 'gote'}
-      ],
-      // Empty rows
-      [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-      [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-      [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined],
 
-      // sente
-      [
-        {kind: 'p', player: 'sente'}, {kind: 'p', player: 'sente'}, {kind: 'p', player: 'sente'},
-        {kind: 'p', player: 'sente'}, {kind: 'p', player: 'sente'}, {kind: 'p', player: 'sente'},
-        {kind: 'p', player: 'sente'}, {kind: 'p', player: 'sente'}, {kind: 'p', player: 'sente'}
-      ],
-      [
-        undefined, {kind: 'b', player: 'sente'}, undefined, undefined, undefined, undefined, undefined,
-        {kind: 'r', player: 'sente'}, undefined
-      ],
-      [
-        {kind: 'l', player: 'sente'}, {kind: 'n', player: 'sente'}, {kind: 's', player: 'sente'},
-        {kind: 'G', player: 'sente'}, {kind: 'K', player: 'sente'}, {kind: 'G', player: 'sente'},
-        {kind: 's', player: 'sente'}, {kind: 'n', player: 'sente'}, {kind: 'l', player: 'sente'}
-      ],
-    ];
   }
 
   private increaseQuantityKoma(koma: Koma) {
@@ -184,7 +161,7 @@ export class ShogiBoard {
 
 
   exportGameToCsa(): string {
-    return ShogiConverter.gameToCSA(this.boardTiles, this.movesHistory);
+    return ShogiConverter.gameToCSA(INITIAL_BOARD, this.movesHistory);
   }
 
 

@@ -99,6 +99,41 @@ export const KOMA_SVG_MAP: Record<string, string> = {
 
 };
 
+export const INITIAL_BOARD: (Koma | undefined)[][] = [[
+  {kind: 'l', player: 'gote'}, {kind: 'n', player: 'gote'}, {kind: 's', player: 'gote'},
+  {kind: 'G', player: 'gote'}, {kind: 'K', player: 'gote'}, {kind: 'G', player: 'gote'},
+  {kind: 's', player: 'gote'}, {kind: 'n', player: 'gote'}, {kind: 'l', player: 'gote'}
+],
+  [
+    undefined, {kind: 'r', player: 'gote'}, undefined, undefined, undefined, undefined, undefined,
+    {kind: 'b', player: 'gote'}, undefined
+  ],
+  [
+    {kind: 'p', player: 'gote'}, {kind: 'p', player: 'gote'}, {kind: 'p', player: 'gote'},
+    {kind: 'p', player: 'gote'}, {kind: 'p', player: 'gote'}, {kind: 'p', player: 'gote'},
+    {kind: 'p', player: 'gote'}, {kind: 'p', player: 'gote'}, {kind: 'p', player: 'gote'}
+  ],
+  // Empty rows
+  [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+  [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+  [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+
+  // sente
+  [
+    {kind: 'p', player: 'sente'}, {kind: 'p', player: 'sente'}, {kind: 'p', player: 'sente'},
+    {kind: 'p', player: 'sente'}, {kind: 'p', player: 'sente'}, {kind: 'p', player: 'sente'},
+    {kind: 'p', player: 'sente'}, {kind: 'p', player: 'sente'}, {kind: 'p', player: 'sente'}
+  ],
+  [
+    undefined, {kind: 'b', player: 'sente'}, undefined, undefined, undefined, undefined, undefined,
+    {kind: 'r', player: 'sente'}, undefined
+  ],
+  [
+    {kind: 'l', player: 'sente'}, {kind: 'n', player: 'sente'}, {kind: 's', player: 'sente'},
+    {kind: 'G', player: 'sente'}, {kind: 'K', player: 'sente'}, {kind: 'G', player: 'sente'},
+    {kind: 's', player: 'sente'}, {kind: 'n', player: 'sente'}, {kind: 'l', player: 'sente'}
+  ],
+];
 
 export function getSvg(koma: Koma): string; // Signature 1 (with Koma)
 export function getSvg(type: KomaType, player: PlayerType): string; // Signature 2 (with type and player)
