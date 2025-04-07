@@ -1,6 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {Move, movementType} from '../../interfaces/move';
 import {KomaType, PlayerType} from '../../interfaces/koma';
+import {ShogiConverter} from '../../services/shogi-logic/shogi-converter';
 
 @Component({
   selector: 'app-move',
@@ -30,7 +31,13 @@ export class MoveComponent implements Move {
 
   // I could write a custom pipe just for fun
   protected getWesterNotation() {
-    return `${this.player === "sente" ? "☗" : "☖"}${this.koma}${this.origin ? `${this.origin.x + 1}${this.origin.y + 1}` : ''}${this.movement}${(this.destination.x + 1)}${(this.destination.y + 1)}${this.promotion || ''}`;
+    let coordinatesOrigin: { x: number, y: number } | undefined;
+    if (this.origin) {
+      coordinatesOrigin = ShogiConverter.virtualCoordinatesToReal(this.origin.x, this.origin.y);
+    }
+    const coordinatesDestination = ShogiConverter.virtualCoordinatesToReal(this.destination.x, this.destination.y);
+
+    return `${this.player === "sente" ? "☗" : "☖"}${this.koma}${coordinatesOrigin ? `${coordinatesOrigin.x}${coordinatesOrigin.y}` : ''}${this.movement}${(coordinatesDestination.x)}${(coordinatesDestination.y)}${this.promotion || ''}`;
   }
 
 }

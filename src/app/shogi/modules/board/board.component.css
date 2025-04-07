@@ -1,19 +1,15 @@
-:host {
-  flex: 2; /* Grid takes up more space than the list */
-}
 
 .grid-item {
   background-color: #e6c4a4;
-  border: 1px solid rgb(168, 109, 76);
+  outline: 1px solid rgb(168, 109, 76);
   box-sizing: border-box;
   aspect-ratio: 1/1;
-
 }
 
 .grid-container {
   display: grid;
   grid-template-columns: repeat(11, 1fr);
-  grid-template-rows: repeat(9, 1fr);
+  grid-template-rows: repeat(8, 1fr);
   box-sizing: border-box;
   /* max-width: 50vw; */
   max-height: 500px;

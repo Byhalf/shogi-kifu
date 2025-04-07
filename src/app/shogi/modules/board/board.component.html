@@ -5,17 +5,12 @@
 
   >
   </shogi-hand>
+
   @for (tile of boardView(); track $index) {
     <shogi-tile class="grid-item"
                 [tile]="tile">
     </shogi-tile>
   }
-  <ol>
-
-    @for (tile of boardView(); track $index) {
-      <li>{{ tile.x }}-{{ tile.y }}</li>
-    }
-  </ol>
 
   <shogi-hand class="column-right"
               [komas]="shogiBoard.senteKomas"

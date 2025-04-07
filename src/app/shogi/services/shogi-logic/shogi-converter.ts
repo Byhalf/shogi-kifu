@@ -24,14 +24,15 @@ export class ShogiConverter {
 
   private static moveToCSA(move: Move, firstPlayer: PlayerType): string {
     let result = firstPlayer === move.player ? "+" : "-";
-    result += move.origin ? ShogiConverter.realCoordinatesToCSA(move.origin.x, move.origin.y) : "00"
-    result += ShogiConverter.realCoordinatesToCSA(move.destination.x, move.destination.y);
+    result += move.origin ? ShogiConverter.virtualCoordinatesToReal(move.origin.x, move.origin.y) : "00"
+    result += (({x, y}) => `${x}${y}`)(ShogiConverter.virtualCoordinatesToReal(move.destination.x, move.destination.y));
     result += move.promotion === "*" ? LATIN_TO_CSA[promotePiece(move.koma)] : LATIN_TO_CSA[move.koma];
     return result;
   }
 
-  private static realCoordinatesToCSA(x: number, y: number): string {
-    return `${9 - x}${y + 1}`;
+  // shogi boards are japanese x is left to right also index starts at 1
+  public static virtualCoordinatesToReal(x: number, y: number): { x: number, y: number } {
+    return {x: 9 - x, y: y + 1};
   }
 
   public static gameToCSA(state: (Koma | undefined)[][], moves: Move[]): string {
