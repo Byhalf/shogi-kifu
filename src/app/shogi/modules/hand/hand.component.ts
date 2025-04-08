@@ -11,7 +11,7 @@ import {NgStyle} from '@angular/common';
     NgStyle,
   ],
   templateUrl: './hand.component.html',
-  styleUrl: './hand.component.css'
+  styleUrl: './hand.component.scss'
 })
 export class HandComponent {
   @Input() player: PlayerType = 'gote';

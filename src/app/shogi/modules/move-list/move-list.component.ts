@@ -7,6 +7,7 @@ import {AsyncPipe} from '@angular/common';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
 import {ShogiBoard} from '../../services/shogi-logic/shogi-board';
+import {MatTab, MatTabGroup} from '@angular/material/tabs';
 
 @Component({
   selector: 'app-move-list',
@@ -14,10 +15,12 @@ import {ShogiBoard} from '../../services/shogi-logic/shogi-board';
     MoveComponent,
     AsyncPipe,
     MatIcon,
-    MatIconButton
+    MatIconButton,
+    MatTabGroup,
+    MatTab
   ],
   templateUrl: './move-list.component.html',
-  styleUrl: './move-list.component.css'
+  styleUrl: './move-list.component.scss'
 })
 export class MoveListComponent {
   private movementService: MovementService;

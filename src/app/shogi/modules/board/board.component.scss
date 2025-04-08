@@ -1,3 +1,4 @@
+@use "sass:map";
 
 .grid-item {
   background-color: #e6c4a4;
@@ -24,7 +25,8 @@
 }
 
 .column-right, .column-left {
-  background-color: cadetblue;
+  outline: 1px solid rgb(var(--mat-sys-on-secondary));
+  background-color: var(--mat-sys-on-secondary-container);
   grid-template-rows: subgrid;
   grid-template-columns: subgrid;
   height: 100%;
@@ -43,6 +45,7 @@
     grid-template-columns: repeat(9, 1fr);
     grid-template-rows: repeat(11, 1fr);
     aspect-ratio: 9/12;
+
   }
 
   .column-left {

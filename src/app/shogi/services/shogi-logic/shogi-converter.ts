@@ -2,7 +2,7 @@ import {Koma, LATIN_TO_CSA, PlayerType, promotePiece} from '../../interfaces/kom
 import {Move} from '../../interfaces/move';
 
 export class ShogiConverter {
-  private static boardStateToCSA(state: (Koma | undefined)[][], firstPlayer: PlayerType): string {
+  public static boardStateToCSA(state: (Koma | undefined)[][], firstPlayer: PlayerType): string {
     let result = "V2.2\n"
     for (let i = 0; i < state.length; i++) {
       result += "P" + (i + 1);
@@ -22,7 +22,7 @@ export class ShogiConverter {
     return result;
   }
 
-  private static moveToCSA(move: Move, firstPlayer: PlayerType): string {
+  public static moveToCSA(move: Move, firstPlayer: PlayerType): string {
     let result = firstPlayer === move.player ? "+" : "-";
     result += move.origin ? ShogiConverter.virtualCoordinatesToReal(move.origin.x, move.origin.y) : "00"
     result += (({x, y}) => `${x}${y}`)(ShogiConverter.virtualCoordinatesToReal(move.destination.x, move.destination.y));

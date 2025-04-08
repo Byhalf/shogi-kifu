@@ -40,4 +40,5 @@ export class MoveComponent implements Move {
     return `${this.player === "sente" ? "☗" : "☖"}${this.koma}${coordinatesOrigin ? `${coordinatesOrigin.x}${coordinatesOrigin.y}` : ''}${this.movement}${(coordinatesDestination.x)}${(coordinatesDestination.y)}${this.promotion || ''}`;
   }
 
+
 }

@@ -15,7 +15,7 @@ import {BoardEventBusServiceService} from '../../services/event-services/board-e
   selector: 'shogi-board',
   imports: [TileComponent, HandComponent, MatIcon, MatIconButton, MatIconButton],
   templateUrl: './board.component.html',
-  styleUrl: './board.component.css',
+  styleUrl: './board.component.scss',
 })
 export class BoardComponent {
 

@@ -1,11 +1,3 @@
-<!--
-@for (_ of [].constructor(7); track $index) {
-  <div class="hand-item" [ngStyle]="{'grid-row':{$index}}">
-    <img src="assets/koma/0FU.svg">
-  </div>
-}
--->
-
 @for (koma of komas; track $index) {
   <span class="hand-item" matBadge="{{koma[1]}}"
         [ngStyle]="player === 'sente' ? {'grid-row': 9- $index} : {}">
