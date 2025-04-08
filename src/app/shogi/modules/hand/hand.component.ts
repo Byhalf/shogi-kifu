@@ -2,11 +2,13 @@ import {Component, Input} from '@angular/core';
 import {getSvg, Koma, KomaType, PlayerType} from '../../interfaces/koma';
 import {MatBadge} from '@angular/material/badge';
 import {BoardEventBusServiceService} from '../../services/event-services/board-event-bus-service.service';
+import {NgStyle} from '@angular/common';
 
 @Component({
   selector: 'shogi-hand',
   imports: [
     MatBadge,
+    NgStyle,
   ],
   templateUrl: './hand.component.html',
   styleUrl: './hand.component.css'

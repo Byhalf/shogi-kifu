@@ -1,7 +1,17 @@
+<!--
+@for (_ of [].constructor(7); track $index) {
+  <div class="hand-item" [ngStyle]="{'grid-row':{$index}}">
+    <img src="assets/koma/0FU.svg">
+  </div>
+}
+-->
+
 @for (koma of komas; track $index) {
-  <span matBadge="{{koma[1]}}"
-  >
+  <span class="hand-item" matBadge="{{koma[1]}}"
+        [ngStyle]="player === 'sente' ? {'grid-row': 9- $index} : {}">
+
   <img [src]="getSvg(koma[0],this.player)"
+
        (dragstart)="onDragStart({kind:koma[0],player:this.player})"
        alt="shogi piece">
 </span>
