@@ -4,6 +4,7 @@ import {getSvg} from '../../interfaces/koma';
 import {NgIf} from '@angular/common';
 import {finalize, Subject, switchMap, takeUntil, tap, timer} from 'rxjs';
 import {BoardEventBusServiceService} from '../../services/event-services/board-event-bus-service.service';
+import {TileView} from '../../interfaces/TileView';
 
 @Component({
   selector: 'shogi-tile',
@@ -15,7 +16,7 @@ import {BoardEventBusServiceService} from '../../services/event-services/board-e
 })
 export class TileComponent {
 
-  @Input() tile: Tile = {x: -1, y: -1};
+  @Input() tile: TileView = {x: -1, y: -1};
   @Output() tileDoubleClicked = new EventEmitter<Tile>();
 
   private drop$ = new Subject<Tile>();
@@ -24,7 +25,6 @@ export class TileComponent {
 
   constructor(boardEventBusService: BoardEventBusServiceService) {
     this.boardEventBusService = boardEventBusService;
-
     this.drop$
       .pipe(
         switchMap((tile) =>
@@ -50,7 +50,7 @@ export class TileComponent {
     this.boardEventBusService.selectTile(tile);
   }
 
-  onDrop(event: DragEvent, tile: Tile) {
+  onDrop(event: DragEvent, tile: TileView) {
     event.preventDefault();
     this.drop$.next(tile);
     this.boardEventBusService.dropOnTile(tile);

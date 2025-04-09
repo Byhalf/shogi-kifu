@@ -1,4 +1,5 @@
-<span (drop)="onDrop($event,tile)" (dragover)="allowDrop($event)">
+<span (drop)="onDrop($event,tile)" (dragover)="allowDrop($event)"
+      [style.backgroundColor]="tile.color">
     <ng-container *ngIf="tile.koma">
     <img (dragstart)="onDragStart(tile)"
          (dblclick)="onDoubleClick(tile)"

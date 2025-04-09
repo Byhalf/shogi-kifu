@@ -10,6 +10,7 @@ import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
 import {ShogiBoard} from '../../services/shogi-logic/shogi-board';
 import {BoardEventBusServiceService} from '../../services/event-services/board-event-bus-service.service';
+import {TileView} from '../../interfaces/TileView';
 
 @Component({
   selector: 'shogi-board',
@@ -22,7 +23,7 @@ export class BoardComponent {
   private movementService: MovementService;
   protected shogiBoard: ShogiBoard;
   private readonly destroyRef: DestroyRef;
-  protected boardView: Signal<Tile[]>;
+  protected boardView: Signal<TileView[]>;
   private boardEventBusService: BoardEventBusServiceService;
 
   constructor(movementService: MovementService, boardEventBusService: BoardEventBusServiceService, shogiBoard: ShogiBoard, destroyRef: DestroyRef) {
@@ -36,7 +37,7 @@ export class BoardComponent {
 
   private convertBoardToBoardView(board: (Koma | undefined)[][]): Signal<Tile[]> {
     return computed(() => {
-      const tiles: Tile[] = [];
+      const tiles: TileView[] = [];
       for (let y = 0; y < 9; y++) {
         // Safety check for undefined rows
         for (let x = 0; x < 9; x++) {
@@ -115,13 +116,14 @@ export class BoardComponent {
   }
 
   private makeMove(move: Move): void {
-    let newTile: Tile = {
+    let newTile: TileView = {
       koma: {
         player: move.player,
         kind: move.promotion === "*" ?
           promotePiece(move.koma) : move.koma
       },
-      x: move.destination.x, y: move.destination.y
+      x: move.destination.x, y: move.destination.y,
+      color: "blue"
     };
     this.boardView()[this.oneDtoTwoD(newTile.x, newTile.y)] = newTile;
     if (move.origin) {

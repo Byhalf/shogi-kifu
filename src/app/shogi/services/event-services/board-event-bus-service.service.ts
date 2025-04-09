@@ -64,7 +64,6 @@ export class BoardEventBusServiceService {
   }
 
   dropOnTile(to: Tile) {
-    console.log("bus: ", to);
     this.tileDropped.next(to);
   }
 
