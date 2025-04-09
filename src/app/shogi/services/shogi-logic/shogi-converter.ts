@@ -24,7 +24,8 @@ export class ShogiConverter {
 
   public static moveToCSA(move: Move, firstPlayer: PlayerType): string {
     let result = firstPlayer === move.player ? "+" : "-";
-    result += move.origin ? ShogiConverter.virtualCoordinatesToReal(move.origin.x, move.origin.y) : "00"
+    result += move.origin ?
+      (({x, y}) => `${x}${y}`)(ShogiConverter.virtualCoordinatesToReal(move.origin.x, move.origin.y)) : "00"
     result += (({x, y}) => `${x}${y}`)(ShogiConverter.virtualCoordinatesToReal(move.destination.x, move.destination.y));
     result += move.promotion === "*" ? LATIN_TO_CSA[promotePiece(move.koma)] : LATIN_TO_CSA[move.koma];
     return result;
