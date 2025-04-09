@@ -3,6 +3,7 @@ import {
   isKomaUnpromoted,
   Koma,
   KomaType,
+  PlayerType,
   promotePiece,
   swapPlayer,
   unPromotePiece
@@ -65,6 +66,9 @@ export class ShogiBoard {
     if (!fromTile.koma || fromTile.koma.player === toTile.koma?.player) {
       return undefined;
     }
+    if (!this.isPlayersTurn(fromTile.koma.player)) {
+      return undefined;
+    }
     if (toTile.koma) {
       moveType = "x";
       eatenKoma = toTile.koma.kind;
@@ -90,6 +94,9 @@ export class ShogiBoard {
   dropKomaFromHand(koma: Koma | undefined, toTile: Tile) {
     if (!koma || toTile.koma) {
       return;
+    }
+    if (!this.isPlayersTurn(koma.player)) {
+      return undefined;
     }
     this.decreaseQuantityKoma(koma);
     console.log(toTile)
@@ -164,5 +171,12 @@ export class ShogiBoard {
     return ShogiConverter.gameToCSA(INITIAL_BOARD, this.movesHistory);
   }
 
+  private isPlayersTurn(player: PlayerType): boolean {
+    if (!this.movesHistory || this.movesHistory.length === 0) {
+      return true;
+    }
+    return this.movesHistory[this.movesHistory.length - 1].player !== player;
+
+  }
 
 }

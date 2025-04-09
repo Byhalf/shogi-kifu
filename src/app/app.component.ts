@@ -1,11 +1,9 @@
 import {Component} from '@angular/core';
-import {BoardComponent} from './shogi/modules/board/board.component';
-import {MoveListComponent} from './shogi/modules/move-list/move-list.component';
-import {MatToolbar} from '@angular/material/toolbar';
+import {NavigationComponent} from './navigation/navigation.component';
 
 @Component({
   selector: 'app-root',
-  imports: [BoardComponent, MoveListComponent, MatToolbar],
+  imports: [NavigationComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
