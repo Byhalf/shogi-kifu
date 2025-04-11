@@ -1,4 +1,4 @@
-<span (drop)="onDrop($event,tile)" (dragover)="allowDrop($event)">
+<span (drop)="onDrop($event,tile)" (dragover)="dragOver($event)" (dragleave)="dragLeave($event)">
     <ng-container *ngIf="tile.koma">
     <img (dragstart)="onDragStart(tile)"
          (dblclick)="onDoubleClick(tile)"

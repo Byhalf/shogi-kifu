@@ -54,12 +54,22 @@ export class TileComponent {
     event.preventDefault();
     this.drop$.next(tile);
     this.boardEventBusService.dropOnTile(tile);
+    const target = event.currentTarget as HTMLElement;
+    target.classList.remove('drag-over');
   }
 
-// required for onDrop firing
-  allowDrop(event: DragEvent): void {
+  dragOver(event: DragEvent): void {
+    // required for onDrop firing
     event.preventDefault();
+    const target = event.currentTarget as HTMLElement;
+    target.classList.add('drag-over');
   }
+
+  dragLeave(event: DragEvent): void {
+    const target = event.currentTarget as HTMLElement;
+    target.classList.remove('drag-over');
+  }
+
 
   protected readonly getSvg = getSvg;
 

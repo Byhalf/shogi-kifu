@@ -1,9 +1,20 @@
+@use '@angular/material' as mat;
+@use 'sass:map';
+
 span {
   width: 100%;
   height: 100%;
   display: block;
   padding: 0;
   box-sizing: border-box;
+}
+
+:host:hover {
+  background-color: var(--mat-sys-on-primary-container); /*I want the shade 60 but i don't understand how material theming works*/
+}
+
+.drag-over {
+  background-color: var(--mat-sys-on-primary-container); /*I want the shade 60 but i don't understand how material theming works*/
 }
 
 img {
