@@ -11,7 +11,7 @@ import {BoardEventBusServiceService} from '../../services/event-services/board-e
     NgIf
   ],
   templateUrl: './tile.component.html',
-  styleUrl: './tile.component.scss',
+  styleUrls: ['./tile.component.scss', '../../styles/koma.scss']
 })
 export class TileComponent {
 

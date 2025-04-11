@@ -3,7 +3,7 @@
         [ngStyle]="player === 'sente' ? {'grid-row': 9- $index} : {}">
 
   <img [src]="getSvg(koma[0],this.player)"
-
+       class="koma-svg"
        (dragstart)="onDragStart({kind:koma[0],player:this.player})"
        alt="shogi piece">
 </span>

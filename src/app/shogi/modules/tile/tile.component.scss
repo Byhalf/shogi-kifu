@@ -9,19 +9,11 @@ span {
   box-sizing: border-box;
 }
 
-:host:hover {
-  background-color: var(--mat-sys-on-primary-container); /*I want the shade 60 but i don't understand how material theming works*/
-}
 
 .drag-over {
   background-color: var(--mat-sys-on-primary-container); /*I want the shade 60 but i don't understand how material theming works*/
 }
 
-img {
-  max-width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-  margin: auto;
-  aspect-ratio: 1/1;
+:host:hover {
+  background-color: rgba(230, 147, 102, 0.47);
 }

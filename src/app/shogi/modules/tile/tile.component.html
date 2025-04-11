@@ -2,7 +2,7 @@
     <ng-container *ngIf="tile.koma">
     <img (dragstart)="onDragStart(tile)"
          (dblclick)="onDoubleClick(tile)"
-         [src]="getSvg(tile.koma)" alt="shogi piece" draggable="true"
+         [src]="getSvg(tile.koma)" alt="shogi piece" draggable="true" class="koma-svg"
     >
       </ng-container>
 </span>

@@ -1,0 +1,15 @@
+@use '@angular/material' as mat;
+@use 'sass:map';
+
+.koma-svg {
+  max-width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  margin: auto;
+  aspect-ratio: 1/1;
+}
+
+.koma-svg:hover {
+  background-color: var(--mat-sys-on-primary-container);
+}
