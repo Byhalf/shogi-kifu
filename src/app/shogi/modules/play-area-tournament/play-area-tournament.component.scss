@@ -1,3 +1,11 @@
 :host {
   display: flex;
+  flex-wrap: wrap;
+}
+
+
+@media screen and (max-width: 700px) {
+  app-move-list {
+    width: 50%;
+  }
 }

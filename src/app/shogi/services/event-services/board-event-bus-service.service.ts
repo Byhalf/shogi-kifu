@@ -9,17 +9,20 @@ import {Koma} from '../../interfaces/koma';
 export class BoardEventBusServiceService {
   //  sources
   private tileSelected = new Subject<Tile>();
-  private komaSelected = new Subject<Koma>();
+  public komaSelected = new Subject<Koma>();
   private promoteKoma = new Subject<Tile>();
   private tileDropped = new Subject<Tile>();
 
-  private cancellations = merge(this.tileSelected, this.komaSelected);
+  private tileOrKomaSelected = merge(this.tileSelected, this.komaSelected);
 
   // Combined move stream
   moveAttempt$ = this.tileSelected.pipe(
     switchMap(selectedTile =>
       this.tileDropped.pipe(
-        takeUntil(this.cancellations), // Reset if new selection occurs
+        /*
+                filter(drop => !(drop.x === selectedTile.x && drop.y === selectedTile.y)),
+        */
+        takeUntil(this.tileOrKomaSelected), // Reset if new selection occurs
         map((to) => ({
           from: selectedTile,
           to
@@ -37,7 +40,7 @@ export class BoardEventBusServiceService {
           ),
           timer(1000).pipe(mergeMap(() => EMPTY))
         ).pipe(
-          takeUntil(this.cancellations),
+          takeUntil(this.tileOrKomaSelected),
         );
       }
     )
@@ -46,7 +49,7 @@ export class BoardEventBusServiceService {
   komaMoveAttempt$ = this.komaSelected.pipe(
     switchMap(selectedKoma =>
       this.tileDropped.pipe(
-        takeUntil(this.cancellations), // Reset if new selection occurs
+        takeUntil(this.tileOrKomaSelected), // Reset if new selection occurs
         map((to) => ({
           koma: selectedKoma,
           to
@@ -64,7 +67,6 @@ export class BoardEventBusServiceService {
   }
 
   dropOnTile(to: Tile) {
-    console.log("bus: ", to);
     this.tileDropped.next(to);
   }
 

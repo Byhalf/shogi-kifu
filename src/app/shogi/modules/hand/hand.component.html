@@ -4,6 +4,7 @@
 
   <img [src]="getSvg(koma[0],this.player)"
        class="koma-svg"
+       (click)="onDragStart({kind:koma[0],player:this.player})"
        (dragstart)="onDragStart({kind:koma[0],player:this.player})"
        alt="shogi piece">
 </span>

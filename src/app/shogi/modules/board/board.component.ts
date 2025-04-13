@@ -10,12 +10,13 @@ import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
 import {ShogiBoard} from '../../services/shogi-logic/shogi-board';
 import {BoardEventBusServiceService} from '../../services/event-services/board-event-bus-service.service';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'shogi-board',
-  imports: [TileComponent, HandComponent, MatIcon, MatIconButton, MatIconButton],
+  imports: [TileComponent, HandComponent, MatIcon, MatIconButton, MatIconButton, NgClass],
   templateUrl: './board.component.html',
-  styleUrl: './board.component.scss',
+  styleUrls: ['./board.component.scss', '../../styles/koma.scss'],
 })
 export class BoardComponent {
 
@@ -24,6 +25,7 @@ export class BoardComponent {
   private readonly destroyRef: DestroyRef;
   protected boardView: Signal<Tile[]>;
   private boardEventBusService: BoardEventBusServiceService;
+  protected selectedPiece: undefined | Tile | Koma = undefined;
 
   constructor(movementService: MovementService, boardEventBusService: BoardEventBusServiceService, shogiBoard: ShogiBoard, destroyRef: DestroyRef) {
     this.movementService = movementService;
@@ -56,6 +58,7 @@ export class BoardComponent {
     this.boardEventBusService.moveAttempt$.subscribe({
       next: ({from, to}) => {
         this.shogiBoard.moveKomaOnBoard(from, to);
+        this.selectedPiece = undefined;
       }
     });
 
@@ -63,6 +66,7 @@ export class BoardComponent {
     this.boardEventBusService.komaMoveAttempt$.subscribe({
       next: ({koma, to}) => {
         this.shogiBoard.dropKomaFromHand(koma, to);
+        this.selectedPiece = undefined;
       }
     });
 
@@ -73,6 +77,12 @@ export class BoardComponent {
         }
       }
     )
+
+    this.boardEventBusService.komaSelected.subscribe({
+      next: (koma) => {
+        this.selectedPiece = koma;
+      }
+    })
 
     //update view
     this.movementService.movements$.subscribe({
@@ -87,6 +97,7 @@ export class BoardComponent {
 
   public handleUndoClick(): void {
     this.shogiBoard.undoMovement();
+    this.selectedPiece = undefined;
   }
 
   private undoMove(move: Move): void {
@@ -141,5 +152,21 @@ export class BoardComponent {
   private oneDtoTwoD(x: number, y: number): number {
     return y * 9 + x;
   }
+
+  handleClick($event: Event, tile: Tile) {
+    console.log("old:", this.selectedPiece);
+
+    if (this.selectedPiece) {
+      this.boardEventBusService.dropOnTile(tile);
+    } else {
+      if (tile.koma) {
+        this.selectedPiece = tile;
+        this.boardEventBusService.selectTile(tile);
+      }
+    }
+    console.log("new:", this.selectedPiece);
+
+  }
+
 }
 

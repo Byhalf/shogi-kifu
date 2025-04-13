@@ -99,9 +99,6 @@ export class ShogiBoard {
       return undefined;
     }
     this.decreaseQuantityKoma(koma);
-    console.log(toTile)
-    console.log(toTile.y)
-
     this.boardTiles[toTile.y][toTile.x] = {kind: koma.kind, player: koma.player};
     this.movementService.pushMovement({
       koma: koma.kind,
