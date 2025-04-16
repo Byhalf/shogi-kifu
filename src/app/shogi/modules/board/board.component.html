@@ -7,9 +7,9 @@
   </shogi-hand>
 
   @for (tile of boardView(); track $index) {
-    <shogi-tile class="grid-item" (click)="handleClick($event,tile)"
-                [tile]="tile" [ngClass]="{'selected-koma': tile===selectedPiece}">
-    </shogi-tile>
+    <app-shogi-tile class="grid-item" (click)="handleClick($event,tile)"
+                    [tile]="tile" [ngClass]="{'selected-koma': tile===selectedPiece}">
+    </app-shogi-tile>
   }
 
   <shogi-hand class="column-right"

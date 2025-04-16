@@ -1,10 +1,11 @@
 <span (drop)="onDrop($event,tile)"
       (dragover)="dragOver($event)"
       (dragleave)="dragLeave($event)">
-    <ng-container *ngIf="tile.koma">
-    <img (dragstart)="onDragStart(tile)"
-         (dblclick)="onDoubleClick(tile)"
-         [src]="getSvg(tile.koma)" alt="shogi piece" draggable="true" class="koma-svg"
-    >
+    <ng-container *ngIf="safeSvg!==''">
+      <div (dragstart)="onDragStart(tile)"
+           (dblclick)="onDoubleClick(tile)"
+           [innerHTML]="safeSvg"
+           draggable="true" class="koma-svg">
+      </div>
       </ng-container>
 </span>
